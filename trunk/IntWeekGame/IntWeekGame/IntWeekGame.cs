@@ -92,6 +92,8 @@ namespace IntWeekGame
             parallelGameObjectCollection = new List<ParallelGameObject>();
 			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
+			this.Components.Add(new Hud(this));
+
 			base.Initialize();
 		}
 
@@ -112,6 +114,7 @@ namespace IntWeekGame
 			roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
 			player = new Player(Content.Load<Texture2D>("Sprites/testplayer"));
             streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
+
 			//testBall = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 			//parallelGameObjectCollection.Add(testBall);
 

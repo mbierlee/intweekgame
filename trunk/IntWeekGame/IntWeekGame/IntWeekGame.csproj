@@ -85,6 +85,7 @@
     <Reference Include="WiimoteLib, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hud.cs" />
     <Compile Include="ParallelGameObject.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

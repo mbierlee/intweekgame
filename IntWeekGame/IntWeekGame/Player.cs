@@ -25,10 +25,10 @@ namespace IntWeekGame
 
         public Player(Texture2D playerTexture)
         {
-            IntWeekGame Game = (IntWeekGame)IntWeekGame.GameInstance;
+            IntWeekGame game = (IntWeekGame)IntWeekGame.GameInstance;
 
             this.playerTexture = playerTexture;
-            XPosition = (float)Game.GraphicsDevice.Viewport.Width / 2;
+            XPosition = (float)game.GraphicsDevice.Viewport.Width / 2;
             YPosition = 550f;
             origin = new Vector2(75, 250);
         }

@@ -14,10 +14,11 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace IntWeekGame
 {
-    class ParallelGameObject 
+    public class ParallelGameObject 
     {
         public Texture2D Texture2D { get; private set; }
         public bool Disposing { get; private set;}
+        public bool IsFlat { get; set; }
 
         public ParallelGameObject(Texture2D texture2D)
         {
@@ -33,6 +34,7 @@ namespace IntWeekGame
         public Vector2 Origin { get; set; }
         public float Speed { get; set; }
         public Rectangle DrawingArea { get; private set; }
+        public int Depth { get; private set; }
 
         private float scale;
 
@@ -48,6 +50,8 @@ namespace IntWeekGame
 
             DrawingArea = new Rectangle((int)(Position.X - (Origin.X * scale)), (int)(Position.Y - (Origin.Y * scale)),
                                         (int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
+            //DrawingArea = new Rectangle((int)(Position.X), (int)(Position.Y),
+              //                        (int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
         }
 
         /// <summary>
@@ -58,7 +62,7 @@ namespace IntWeekGame
         {
             if (!Disposing)
             {
-                spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White);
+                spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1 - scale);
             }
         }
         

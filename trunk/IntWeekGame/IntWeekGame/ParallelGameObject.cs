@@ -19,6 +19,8 @@ namespace IntWeekGame
         public Texture2D Texture2D { get; private set; }
         public bool Disposing { get; private set;}
         public bool IsFlat { get; set; }
+        public SpriteEffects SpriteEffects { get; set; }
+        public bool Collidable { get; set; }
 
         public ParallelGameObject(Texture2D texture2D)
         {
@@ -26,7 +28,7 @@ namespace IntWeekGame
             DrawingArea = Rectangle.Empty;
             Position = Vector2.Zero;
             Direction = Vector2.Zero;
-            Disposing = false;
+            SpriteEffects = SpriteEffects.None;
         }
 
         public Vector2 Position { get; set; }
@@ -62,7 +64,7 @@ namespace IntWeekGame
         {
             if (!Disposing)
             {
-                spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1 - scale);
+                spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White, 0, Vector2.Zero, SpriteEffects, 1 - scale);
             }
         }
         

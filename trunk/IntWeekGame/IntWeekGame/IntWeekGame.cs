@@ -51,7 +51,7 @@ namespace IntWeekGame
 		private KeyboardState keyboardState;
 
 		private Wiimote Wiimote;
-		private bool rumble;
+		//private bool rumble;
 		private DateTime rumbleDateTime;
 
 		public IntWeekGame()
@@ -72,7 +72,7 @@ namespace IntWeekGame
 			{
 				Wiimote.Connect();
 				Wiimote.SetReportType(InputReport.IRAccel, true);
-				rumble = false;
+				//rumble = false;
 			}
 			catch { }
 		}
@@ -87,8 +87,6 @@ namespace IntWeekGame
 		/// </summary>
 		protected override void Initialize()
 		{
-
-			//parallelGameObjectCollection = new List<ParallelGameObject>();
             parallelGameObjectCollection = new List<ParallelGameObject>();
 			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -115,12 +113,9 @@ namespace IntWeekGame
 			player = new Player(Content.Load<Texture2D>("Sprites/testplayer"));
             streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
 
-			//testBall = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
-			//parallelGameObjectCollection.Add(testBall);
-
 			testBall = Content.Load<Texture2D>("Sprites/testball");
 
-			// Cheat to getting roadmarks on the map before the game begins.
+			// Cheat to getting scenery before the game begins.
 			for (int i = 0; i < (2000 / ScrollSpeed); i++)
 			{
 				SpawnRoadObjects();
@@ -193,7 +188,6 @@ namespace IntWeekGame
 			}
 			else
 			{
-                //player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3)));
                 player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3))) / 2;
 			}
 		}
@@ -251,9 +245,10 @@ namespace IntWeekGame
             
             if (streetLightSpawnTicker > (300 / ScrollSpeed))
             {
-                //ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = new Vector2(-382, 600) / 600 };
-                ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
+                ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = new Vector2(-382, 600) / 600 };
+                ParallelGameObject streetLight2 = new ParallelGameObject(streetLightTexture) { SpriteEffects = SpriteEffects.FlipHorizontally ,Origin = new Vector2(88, 282), Position = Horizon, Direction = new Vector2(382, 600) / 600 };
                 parallelGameObjectCollection.Add(streetLight);
+                parallelGameObjectCollection.Add(streetLight2);
                 streetLightSpawnTicker = 0;
             }
 

@@ -44,7 +44,6 @@ namespace IntWeekGame
 	    private readonly float wiiMovementScale;
 
 	    private float balanceModifier;
-	    private float balanceModifierStrength;
 
 	    private KeyboardState keyboardState;
 
@@ -57,7 +56,6 @@ namespace IntWeekGame
 		    movementScale = 10;
 		    wiiMovementScale = 50;
             ScrollSpeed = 0.5f;
-		    balanceModifierStrength = 0.01f;
 
 			GameInstance = this;
 
@@ -137,33 +135,39 @@ namespace IntWeekGame
 		{
 			keyboardState = Keyboard.GetState();
 
-		    Random random = new Random((int)gameTime.TotalRealTime.Ticks);
-		    int balanceModificationDirectionChance = random.Next(1, 100);
-            if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
-            {
-                balanceModifier = (float)random.NextDouble();
-            } else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
-            {
-                balanceModifier = (float)random.NextDouble() * -1f; 
-            }
+		    CalculateBalance(gameTime);
 
-			AddRoadMarks();
+		    AddRoadMarks();
 			UpdateParallelGameObjects();
 
             ProcessUserInput();
 
 		    player.Update();
 
-            if (player.Balance == -1f || player.Balance == 1f)
-            {
-                ScrollSpeed = 0f;
-            } else
-            {
-                player.Balance += (balanceModifier * balanceScale);
-            }
-
 			base.Update(gameTime);
 		}
+
+	    private void CalculateBalance(GameTime gameTime)
+	    {
+	        Random random = new Random((int)gameTime.TotalRealTime.Ticks);
+	        int balanceModificationDirectionChance = random.Next(1, 100);
+	        if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
+	        {
+	            balanceModifier = (float)random.NextDouble();
+	        } else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
+	        {
+	            balanceModifier = (float)random.NextDouble() * -1f; 
+	        }
+
+	        if (player.Balance == -1f || player.Balance == 1f)
+	        {
+	            ScrollSpeed = 0f;
+	        }
+	        else
+	        {
+	            player.Balance += (balanceModifier * balanceScale);
+	        }
+	    }
 
 	    private void ProcessUserInput()
 	    {
@@ -174,18 +178,16 @@ namespace IntWeekGame
 
 	        if (wm != null)
 	        {
-	            player.XPosition += wm.WiimoteState.AccelState.Values.X * wiiMovementScale;
+	            //player.XPosition += wm.WiimoteState.AccelState.Values.X * wiiMovementScale;
 	            player.Balance += wm.WiimoteState.AccelState.Values.X * wiiBalanceScale;
 	        }
 
 	        if (keyboardState.IsKeyDown(Keys.Left))
 	        {
-	            player.XPosition -= movementScale;
 	            player.Balance -= balanceScale;
 	        }
 	        else if (keyboardState.IsKeyDown(Keys.Right))
 	        {
-	            player.XPosition += movementScale;
 	            player.Balance += balanceScale;
 	        }
 	    }

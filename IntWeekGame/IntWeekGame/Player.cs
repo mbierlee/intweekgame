@@ -43,6 +43,17 @@ namespace IntWeekGame
             spriteBatch.Draw(IntWeekGame.testBall, new Vector2((balance * 400) + 400, 0), Color.White);
         }
 
+        public void InfluenceFromBalance ()
+        {
+            if (Balance > 0)
+            {
+                XPosition += (10*Math.Abs(Balance));
+            } else if (Balance < 0)
+            {
+                XPosition -= (10*Math.Abs(Balance));
+            }
+        }
+
         private float xPosition;
 
         public float XPosition

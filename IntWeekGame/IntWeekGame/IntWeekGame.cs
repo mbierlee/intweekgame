@@ -33,8 +33,8 @@ namespace IntWeekGame
 
 		public Vector2 Horizon;
 		private byte roadMarksInterval;
-		private float scrollSpeed;
-		private Rectangle viewPortRectangle;
+	    public float ScrollSpeed { get; private set; }
+	    private Rectangle viewPortRectangle;
 
 	    public static Texture2D testBall;
 
@@ -56,6 +56,7 @@ namespace IntWeekGame
 		    wiiBalanceScale = 0.05f;
 		    movementScale = 10;
 		    wiiMovementScale = 50;
+            ScrollSpeed = 0.5f;
 
 			GameInstance = this;
 
@@ -83,7 +84,7 @@ namespace IntWeekGame
 		/// </summary>
 		protected override void Initialize()
 		{
-			scrollSpeed = 0.5f;
+			
 			parallelGameObjectCollection = new List<ParallelGameObject>();
 			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -109,9 +110,9 @@ namespace IntWeekGame
 		    testBall = Content.Load<Texture2D>("Sprites/testball");
 
 			// Cheat to getting roadmarks on the map before the game begins.
-			for (int i = 0; i < (2000 / scrollSpeed); i++)
+			for (int i = 0; i < (2000 / ScrollSpeed); i++)
 			{
-				UpdateRoadMarks();
+				AddRoadMarks();
 				UpdateParallelGameObjects();
 			}
 
@@ -133,41 +134,49 @@ namespace IntWeekGame
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update(GameTime gameTime)
 		{
-		
-
 			keyboardState = Keyboard.GetState();
 
-			UpdateRoadMarks();
+			AddRoadMarks();
 			UpdateParallelGameObjects();
 
-            if (wm.WiimoteState.ButtonState.A)
+            ProcessUserInput();
+
+		    player.Update();
+
+            if (player.Balance == -1f || player.Balance == 1f)
             {
-                this.Exit();
+                ScrollSpeed = 0f;
             }
-
-			if (wm != null)
-			{
-				player.XPosition += wm.WiimoteState.AccelState.Values.Y * wiiMovementScale;
-                player.Balance += wm.WiimoteState.AccelState.Values.Y * wiiBalanceScale;
-			}
-
-			if (keyboardState.IsKeyDown(Keys.Left))
-			{
-				player.XPosition -= movementScale;
-			    player.Balance -= balanceScale;
-			}
-			else if (keyboardState.IsKeyDown(Keys.Right))
-			{
-				player.XPosition += movementScale;
-                player.Balance += balanceScale;
-			}
-
-			player.Update();
 
 			base.Update(gameTime);
 		}
 
-		private void UpdateParallelGameObjects()
+	    private void ProcessUserInput()
+	    {
+	        if (wm.WiimoteState.ButtonState.A)
+	        {
+	            this.Exit();
+	        }
+
+	        if (wm != null)
+	        {
+	            player.XPosition += wm.WiimoteState.AccelState.Values.X * wiiMovementScale;
+	            player.Balance += wm.WiimoteState.AccelState.Values.X * wiiBalanceScale;
+	        }
+
+	        if (keyboardState.IsKeyDown(Keys.Left))
+	        {
+	            player.XPosition -= movementScale;
+	            player.Balance -= balanceScale;
+	        }
+	        else if (keyboardState.IsKeyDown(Keys.Right))
+	        {
+	            player.XPosition += movementScale;
+	            player.Balance += balanceScale;
+	        }
+	    }
+
+	    private void UpdateParallelGameObjects()
 		{
 			for (int i = 0; i < parallelGameObjectCollection.Count; i++)
 			{
@@ -180,12 +189,17 @@ namespace IntWeekGame
 			}
 		}
 
-		private void UpdateRoadMarks()
+		private void AddRoadMarks()
 		{
+            if (ScrollSpeed == 0f)
+            {
+                return;
+            }
+
 			roadMarksInterval++;
-			if (roadMarksInterval > (120 / scrollSpeed))
+            if (roadMarksInterval > (120 / ScrollSpeed))
 			{
-				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture) { Speed = scrollSpeed, Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
+				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 				parallelGameObjectCollection.Add(roadMark);
 				roadMarksInterval = 0;
 			}

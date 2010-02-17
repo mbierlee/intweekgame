@@ -41,8 +41,10 @@ namespace IntWeekGame
         /// </summary>
         public void Update()
         {
+            float scrollSpeed = ((IntWeekGame) IntWeekGame.GameInstance).ScrollSpeed;
+
             scale = Util.GetParallelScaleFromY(Position.Y);
-            Position += (Direction * (scale + 0.1f)) * Speed;
+            Position += (Direction * (scale + 0.1f)) * (Speed + scrollSpeed);
 
             DrawingArea = new Rectangle((int)(Position.X - (Origin.X * scale)), (int)(Position.Y - (Origin.Y * scale)),
                                         (int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));

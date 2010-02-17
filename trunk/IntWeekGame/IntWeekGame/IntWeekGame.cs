@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using WiimoteLib;
+using System.Collections;
 
 namespace IntWeekGame
 {
@@ -20,11 +21,13 @@ namespace IntWeekGame
 	public class IntWeekGame : Microsoft.Xna.Framework.Game
 	{
 		GraphicsDeviceManager graphics;
-		SpriteBatch spriteBatch;
+		private SpriteBatch standingObjectsSpriteBatch;
+	    private SpriteBatch flatObjectsSpriteBatch;
+	    private SpriteBatch backgroundBatch;
 
 		private Texture2D backGroundImage;
 		private Texture2D roadMarkTexture;
-		private Texture2D streetLightTexture;
+	    private Texture2D streetLightTexture;
 		private readonly Rectangle backgroundRectangle;
 
 		private List<ParallelGameObject> parallelGameObjectCollection;
@@ -34,25 +37,22 @@ namespace IntWeekGame
 
 		public Vector2 Horizon;
 		private int roadMarkSpawnTicker;
-		private int streetLightSpawnTicker;
+	    private int streetLightSpawnTicker; 
 		public float ScrollSpeed { get; private set; }
 		private Rectangle viewPortRectangle;
 
 		public static Texture2D testBall;
 
 		private readonly float balanceScale;
-		private readonly float wiiBalanceScale;
+	    private readonly float wiiBalanceScale;
 
 		private float balanceModifier;
 
 		private KeyboardState keyboardState;
 
 		private Wiimote Wiimote;
+		private bool rumble;
 		private DateTime rumbleDateTime;
-
-		AudioEngine audioEngine;
-		SoundBank soundBank;
-		WaveBank waveBank;
 
 		public IntWeekGame()
 		{
@@ -72,6 +72,7 @@ namespace IntWeekGame
 			{
 				Wiimote.Connect();
 				Wiimote.SetReportType(InputReport.IRAccel, true);
+				rumble = false;
 			}
 			catch { }
 		}
@@ -87,7 +88,8 @@ namespace IntWeekGame
 		protected override void Initialize()
 		{
 
-			parallelGameObjectCollection = new List<ParallelGameObject>();
+			//parallelGameObjectCollection = new List<ParallelGameObject>();
+            parallelGameObjectCollection = new List<ParallelGameObject>();
 			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
 			base.Initialize();
@@ -100,17 +102,16 @@ namespace IntWeekGame
 		protected override void LoadContent()
 		{
 			// Create a new SpriteBatch, which can be used to draw textures.
-			spriteBatch = new SpriteBatch(GraphicsDevice);
-			audioEngine = new AudioEngine("Content\\Audio\\Audio.xgs");
-			waveBank = new WaveBank(audioEngine, "Content\\Audio\\Wave Bank.xwb");
-			soundBank = new SoundBank(audioEngine, "Content\\Audio\\Sound Bank.xsb");
+			standingObjectsSpriteBatch = new SpriteBatch(GraphicsDevice);
+            flatObjectsSpriteBatch = new SpriteBatch(GraphicsDevice);
+            backgroundBatch = new SpriteBatch(GraphicsDevice);
 
 			Horizon = new Vector2(((float)graphics.GraphicsDevice.Viewport.Width) / 2, 0);
 
 			backGroundImage = Content.Load<Texture2D>("Backgrounds/bg");
 			roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
 			player = new Player(Content.Load<Texture2D>("Sprites/testplayer"));
-			streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
+            streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
 			//testBall = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 			//parallelGameObjectCollection.Add(testBall);
 
@@ -147,12 +148,10 @@ namespace IntWeekGame
 			UpdateParallelGameObjects();
 
 			ProcessUserInput();
-			player.InfluenceFromBalance();
-			CalculateBalance(gameTime);
+		    player.InfluenceFromBalance();
+            CalculateBalance(gameTime);
 
 			player.Update();
-
-			audioEngine.Update();
 
 			base.Update(gameTime);
 		}
@@ -178,11 +177,10 @@ namespace IntWeekGame
 				{
 					if (player.Fallen == false)
 					{
-						soundBank.PlayCue("Bounce");
 						Wiimote.SetRumble(true);
 						rumbleDateTime = DateTime.Now;
 					}
-					else if (rumbleDateTime != DateTime.MinValue && player.Fallen == true && DateTime.Now.Subtract(rumbleDateTime).Milliseconds > 300)
+					else if (rumbleDateTime != DateTime.MinValue && player.Fallen == true && DateTime.Now.Subtract(rumbleDateTime).Milliseconds > 500)
 					{
 						Wiimote.SetRumble(false);
 						rumbleDateTime = DateTime.MinValue;
@@ -192,8 +190,8 @@ namespace IntWeekGame
 			}
 			else
 			{
-				//player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3)));
-				player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3))) / 2;
+                //player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3)));
+                player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3))) / 2;
 			}
 		}
 
@@ -232,7 +230,7 @@ namespace IntWeekGame
 			}
 		}
 
-		private void SpawnRoadObjects()
+	    private void SpawnRoadObjects()
 		{
 			if (ScrollSpeed == 0f)
 			{
@@ -240,20 +238,21 @@ namespace IntWeekGame
 			}
 
 			roadMarkSpawnTicker++;
-			streetLightSpawnTicker++;
+		    streetLightSpawnTicker++;
 			if (roadMarkSpawnTicker > (120 / ScrollSpeed))
 			{
-				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
+				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture) { IsFlat = true, Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 				parallelGameObjectCollection.Add(roadMark);
 				roadMarkSpawnTicker = 0;
 			}
-
-			if (streetLightSpawnTicker > (300 / ScrollSpeed))
-			{
-				ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
-				parallelGameObjectCollection.Add(streetLight);
-				streetLightSpawnTicker = 0;
-			}
+            
+            if (streetLightSpawnTicker > (300 / ScrollSpeed))
+            {
+                //ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = new Vector2(-382, 600) / 600 };
+                ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
+                parallelGameObjectCollection.Add(streetLight);
+                streetLightSpawnTicker = 0;
+            }
 
 		}
 
@@ -264,17 +263,27 @@ namespace IntWeekGame
 		protected override void Draw(GameTime gameTime)
 		{
 			GraphicsDevice.Clear(Color.CornflowerBlue);
+            backgroundBatch.Begin();
+		    flatObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Texture, SaveStateMode.None);
+            standingObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.BackToFront, SaveStateMode.None);
 
-			spriteBatch.Begin();
-			spriteBatch.Draw(backGroundImage, backgroundRectangle, Color.White);
+            backgroundBatch.Draw(backGroundImage, backgroundRectangle, Color.White);
 
 			foreach (ParallelGameObject parallelGameObject in parallelGameObjectCollection)
 			{
-				parallelGameObject.Draw(spriteBatch);
+                if (parallelGameObject.IsFlat)
+                {
+                    parallelGameObject.Draw(flatObjectsSpriteBatch);
+                } else
+                {
+                    parallelGameObject.Draw(standingObjectsSpriteBatch);
+                }
 			}
 
-			player.Draw(spriteBatch);
-			spriteBatch.End();
+            player.Draw(standingObjectsSpriteBatch);
+            backgroundBatch.End();
+            flatObjectsSpriteBatch.End();
+			standingObjectsSpriteBatch.End();
 
 			base.Draw(gameTime);
 		}

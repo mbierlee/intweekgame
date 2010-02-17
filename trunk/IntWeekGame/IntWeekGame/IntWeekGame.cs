@@ -29,33 +29,35 @@ namespace IntWeekGame
 		private List<ParallelGameObject> parallelGameObjectCollection;
 
 		private Player player;
-        //private ParallelGameObject testBall;
+		//private ParallelGameObject testBall;
 
 		public Vector2 Horizon;
 		private byte roadMarksInterval;
-	    public float ScrollSpeed { get; private set; }
-	    private Rectangle viewPortRectangle;
+		public float ScrollSpeed { get; private set; }
+		private Rectangle viewPortRectangle;
 
-	    public static Texture2D testBall;
+		public static Texture2D testBall;
 
-	    private readonly float balanceScale;
-	    private readonly float wiiBalanceScale;
-	    private readonly float movementScale;
-	    private readonly float wiiMovementScale;
+		private readonly float balanceScale;
+		private readonly float wiiBalanceScale;
+		private readonly float movementScale;
+		private readonly float wiiMovementScale;
 
-	    private float balanceModifier;
+		private float balanceModifier;
 
-	    private KeyboardState keyboardState;
+		private KeyboardState keyboardState;
 
-		Wiimote wm;
+		private Wiimote Wiimote;
+		private bool rumble;
+		private DateTime rumbleDateTime;
 
 		public IntWeekGame()
 		{
-		    balanceScale = 0.02f;
-		    wiiBalanceScale = 0.05f;
-		    movementScale = 10;
-		    wiiMovementScale = 50;
-            ScrollSpeed = 0.5f;
+			balanceScale = 0.02f;
+			wiiBalanceScale = 0.05f;
+			movementScale = 10;
+			wiiMovementScale = 50;
+			ScrollSpeed = 0.5f;
 
 			GameInstance = this;
 
@@ -64,11 +66,12 @@ namespace IntWeekGame
 
 			Content.RootDirectory = "Content";
 
-			wm = new Wiimote();
+			Wiimote = new Wiimote();
 			try
 			{
-				wm.Connect();
-				wm.SetReportType(InputReport.IRAccel, true);
+				Wiimote.Connect();
+				Wiimote.SetReportType(InputReport.IRAccel, true);
+				rumble = false;
 			}
 			catch { }
 		}
@@ -83,7 +86,7 @@ namespace IntWeekGame
 		/// </summary>
 		protected override void Initialize()
 		{
-			
+
 			parallelGameObjectCollection = new List<ParallelGameObject>();
 			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -106,7 +109,7 @@ namespace IntWeekGame
 			//testBall = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 			//parallelGameObjectCollection.Add(testBall);
 
-		    testBall = Content.Load<Texture2D>("Sprites/testball");
+			testBall = Content.Load<Texture2D>("Sprites/testball");
 
 			// Cheat to getting roadmarks on the map before the game begins.
 			for (int i = 0; i < (2000 / ScrollSpeed); i++)
@@ -135,64 +138,79 @@ namespace IntWeekGame
 		{
 			keyboardState = Keyboard.GetState();
 
-		    CalculateBalance(gameTime);
+			CalculateBalance(gameTime);
 
-		    AddRoadMarks();
+			AddRoadMarks();
 			UpdateParallelGameObjects();
 
-            ProcessUserInput();
+			ProcessUserInput();
 
-		    player.Update();
+			player.Update();
 
 			base.Update(gameTime);
 		}
 
-	    private void CalculateBalance(GameTime gameTime)
-	    {
-	        Random random = new Random((int)gameTime.TotalRealTime.Ticks);
-	        int balanceModificationDirectionChance = random.Next(1, 100);
-	        if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
-	        {
-	            balanceModifier = (float)random.NextDouble();
-	        } else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
-	        {
-	            balanceModifier = (float)random.NextDouble() * -1f; 
-	        }
+		private void CalculateBalance(GameTime gameTime)
+		{
+			Random random = new Random((int)gameTime.TotalRealTime.Ticks);
+			int balanceModificationDirectionChance = random.Next(1, 100);
+			if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
+			{
+				balanceModifier = (float)random.NextDouble();
+			}
+			else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
+			{
+				balanceModifier = (float)random.NextDouble() * -1f;
+			}
 
-	        if (player.Balance == -1f || player.Balance == 1f)
-	        {
-	            ScrollSpeed = 0f;
-	        }
-	        else
-	        {
-	            player.Balance += (balanceModifier * balanceScale);
-	        }
-	    }
+			if (player.Balance == -1f || player.Balance == 1f)
+			{
+				ScrollSpeed = 0f;
+				if (Wiimote != null)
+				{
+					if (rumble == false)
+					{
+						Wiimote.SetRumble(true);
+						rumbleDateTime = DateTime.Now;
+						rumble = true;
+					}
+					else if (rumble == true && DateTime.Now.Subtract(rumbleDateTime).Seconds > 1)
+					{
+						Wiimote.SetRumble(false);
+						rumble = false;
+					}
+				}
+			}
+			else
+			{
+				player.Balance += (balanceModifier * balanceScale);
+			}
+		}
 
-	    private void ProcessUserInput()
-	    {
-	        if (wm.WiimoteState.ButtonState.A)
-	        {
-	            this.Exit();
-	        }
+		private void ProcessUserInput()
+		{
+			if (Wiimote.WiimoteState.ButtonState.A)
+			{
+				this.Exit();
+			}
 
-	        if (wm != null)
-	        {
-	            //player.XPosition += wm.WiimoteState.AccelState.Values.X * wiiMovementScale;
-	            player.Balance += wm.WiimoteState.AccelState.Values.X * wiiBalanceScale;
-	        }
+			if (Wiimote != null)
+			{
+				//player.XPosition += wm.WiimoteState.AccelState.Values.X * wiiMovementScale;
+				player.Balance += Wiimote.WiimoteState.AccelState.Values.X * wiiBalanceScale;
+			}
 
-	        if (keyboardState.IsKeyDown(Keys.Left))
-	        {
-	            player.Balance -= balanceScale;
-	        }
-	        else if (keyboardState.IsKeyDown(Keys.Right))
-	        {
-	            player.Balance += balanceScale;
-	        }
-	    }
+			if (keyboardState.IsKeyDown(Keys.Left))
+			{
+				player.Balance -= balanceScale;
+			}
+			else if (keyboardState.IsKeyDown(Keys.Right))
+			{
+				player.Balance += balanceScale;
+			}
+		}
 
-	    private void UpdateParallelGameObjects()
+		private void UpdateParallelGameObjects()
 		{
 			for (int i = 0; i < parallelGameObjectCollection.Count; i++)
 			{
@@ -207,13 +225,13 @@ namespace IntWeekGame
 
 		private void AddRoadMarks()
 		{
-            if (ScrollSpeed == 0f)
-            {
-                return;
-            }
+			if (ScrollSpeed == 0f)
+			{
+				return;
+			}
 
 			roadMarksInterval++;
-            if (roadMarksInterval > (120 / ScrollSpeed))
+			if (roadMarksInterval > (120 / ScrollSpeed))
 			{
 				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 				parallelGameObjectCollection.Add(roadMark);

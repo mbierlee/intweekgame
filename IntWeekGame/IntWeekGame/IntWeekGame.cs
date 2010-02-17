@@ -173,7 +173,7 @@ namespace IntWeekGame
 						Wiimote.SetRumble(true);
 						rumbleDateTime = DateTime.Now;
 					}
-					else if (rumbleDateTime != DateTime.MinValue && player.Fallen == true && DateTime.Now.Subtract(rumbleDateTime).Seconds > 1)
+					else if (rumbleDateTime != DateTime.MinValue && player.Fallen == true && DateTime.Now.Subtract(rumbleDateTime).Milliseconds > 500)
 					{
 						Wiimote.SetRumble(false);
 						rumbleDateTime = DateTime.MinValue;

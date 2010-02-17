@@ -43,7 +43,7 @@ namespace IntWeekGame
 	    private readonly float movementScale;
 	    private readonly float wiiMovementScale;
 
-	    private float balanceModifierDirection;
+	    private float balanceModifier;
 	    private float balanceModifierStrength;
 
 	    private KeyboardState keyboardState;
@@ -52,11 +52,12 @@ namespace IntWeekGame
 
 		public IntWeekGame()
 		{
-		    balanceScale = 0.05f;
+		    balanceScale = 0.02f;
 		    wiiBalanceScale = 0.05f;
 		    movementScale = 10;
 		    wiiMovementScale = 50;
             ScrollSpeed = 0.5f;
+		    balanceModifierStrength = 0.01f;
 
 			GameInstance = this;
 
@@ -136,6 +137,16 @@ namespace IntWeekGame
 		{
 			keyboardState = Keyboard.GetState();
 
+		    Random random = new Random((int)gameTime.TotalRealTime.Ticks);
+		    int balanceModificationDirectionChance = random.Next(1, 100);
+            if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
+            {
+                balanceModifier = (float)random.NextDouble();
+            } else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
+            {
+                balanceModifier = (float)random.NextDouble() * -1f; 
+            }
+
 			AddRoadMarks();
 			UpdateParallelGameObjects();
 
@@ -146,6 +157,9 @@ namespace IntWeekGame
             if (player.Balance == -1f || player.Balance == 1f)
             {
                 ScrollSpeed = 0f;
+            } else
+            {
+                player.Balance += (balanceModifier * balanceScale);
             }
 
 			base.Update(gameTime);

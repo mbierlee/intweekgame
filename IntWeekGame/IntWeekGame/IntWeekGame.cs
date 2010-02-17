@@ -54,7 +54,7 @@ namespace IntWeekGame
 		public IntWeekGame()
 		{
 			balanceScale = 0.01f;
-			wiiBalanceScale = 0.05f;
+			wiiBalanceScale = 0.01f;
 			ScrollSpeed = 0.5f;
 
 			GameInstance = this;
@@ -238,13 +238,13 @@ namespace IntWeekGame
 				parallelGameObjectCollection.Add(roadMark);
 				roadMarkSpawnTicker = 0;
 			}
-            /*
+            
             if (streetLightSpawnTicker > (300 / ScrollSpeed))
             {
                 ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
                 parallelGameObjectCollection.Add(streetLight);
                 streetLightSpawnTicker = 0;
-            }*/
+            }
 
 		}
 

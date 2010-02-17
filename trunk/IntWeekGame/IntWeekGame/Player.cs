@@ -46,7 +46,7 @@ namespace IntWeekGame
 
         public void InfluenceFromBalance ()
         {
-            XPosition += (2 * Balance);
+            XPosition += (4 * Balance);
         }
 
         private float xPosition;

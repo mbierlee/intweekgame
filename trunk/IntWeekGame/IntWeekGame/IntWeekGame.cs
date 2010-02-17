@@ -165,22 +165,21 @@ namespace IntWeekGame
 			if (player.Balance == -1f || player.Balance == 1f)
 			{
 				ScrollSpeed = 0f;
-			    player.Fallen = true;
 
 				if (Wiimote != null)
 				{
-					if (rumble == false)
+					if (player.Fallen == false)
 					{
 						Wiimote.SetRumble(true);
 						rumbleDateTime = DateTime.Now;
-						rumble = true;
 					}
-					else if (rumble == true && DateTime.Now.Subtract(rumbleDateTime).Seconds > 1)
+					else if (rumbleDateTime != DateTime.MinValue && player.Fallen == true && DateTime.Now.Subtract(rumbleDateTime).Seconds > 1)
 					{
 						Wiimote.SetRumble(false);
-						rumble = false;
+						rumbleDateTime = DateTime.MinValue;
 					}
 				}
+				player.Fallen = true;
 			}
 			else
 			{

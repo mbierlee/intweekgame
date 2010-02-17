@@ -21,6 +21,7 @@ namespace IntWeekGame
         private Vector2 position;
         private readonly float YPosition;
         private float balance;
+        public bool Fallen { get; set; }
 
         public Player(Texture2D playerTexture)
         {
@@ -45,13 +46,7 @@ namespace IntWeekGame
 
         public void InfluenceFromBalance ()
         {
-            if (Balance > 0)
-            {
-                XPosition += (10*Math.Abs(Balance));
-            } else if (Balance < 0)
-            {
-                XPosition -= (10*Math.Abs(Balance));
-            }
+            XPosition += (5 * Balance);
         }
 
         private float xPosition;

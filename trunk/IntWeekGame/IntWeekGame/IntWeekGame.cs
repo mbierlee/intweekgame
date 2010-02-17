@@ -24,6 +24,7 @@ namespace IntWeekGame
 
 		private Texture2D backGroundImage;
 		private Texture2D roadMarkTexture;
+	    private Texture2D streetLightTexture;
 		private readonly Rectangle backgroundRectangle;
 
 		private List<ParallelGameObject> parallelGameObjectCollection;
@@ -32,16 +33,15 @@ namespace IntWeekGame
 		//private ParallelGameObject testBall;
 
 		public Vector2 Horizon;
-		private byte roadMarksInterval;
+		private int roadMarkSpawnTicker;
+	    private int streetLightSpawnTicker; 
 		public float ScrollSpeed { get; private set; }
 		private Rectangle viewPortRectangle;
 
 		public static Texture2D testBall;
 
 		private readonly float balanceScale;
-		private readonly float wiiBalanceScale;
-		private readonly float movementScale;
-		private readonly float wiiMovementScale;
+	    private readonly float wiiBalanceScale;
 
 		private float balanceModifier;
 
@@ -53,10 +53,8 @@ namespace IntWeekGame
 
 		public IntWeekGame()
 		{
-			balanceScale = 0.02f;
+			balanceScale = 0.01f;
 			wiiBalanceScale = 0.05f;
-			movementScale = 10;
-			wiiMovementScale = 50;
 			ScrollSpeed = 0.5f;
 
 			GameInstance = this;
@@ -106,6 +104,7 @@ namespace IntWeekGame
 			backGroundImage = Content.Load<Texture2D>("Backgrounds/bg");
 			roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
 			player = new Player(Content.Load<Texture2D>("Sprites/testplayer"));
+            streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
 			//testBall = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 			//parallelGameObjectCollection.Add(testBall);
 
@@ -114,7 +113,7 @@ namespace IntWeekGame
 			// Cheat to getting roadmarks on the map before the game begins.
 			for (int i = 0; i < (2000 / ScrollSpeed); i++)
 			{
-				AddRoadMarks();
+				SpawnRoadObjects();
 				UpdateParallelGameObjects();
 			}
 
@@ -138,12 +137,12 @@ namespace IntWeekGame
 		{
 			keyboardState = Keyboard.GetState();
 
-			CalculateBalance(gameTime);
-
-			AddRoadMarks();
+			SpawnRoadObjects();
 			UpdateParallelGameObjects();
 
 			ProcessUserInput();
+		    player.InfluenceFromBalance();
+            CalculateBalance(gameTime);
 
 			player.Update();
 
@@ -166,6 +165,8 @@ namespace IntWeekGame
 			if (player.Balance == -1f || player.Balance == 1f)
 			{
 				ScrollSpeed = 0f;
+			    player.Fallen = true;
+
 				if (Wiimote != null)
 				{
 					if (rumble == false)
@@ -183,7 +184,7 @@ namespace IntWeekGame
 			}
 			else
 			{
-				player.Balance += (balanceModifier * balanceScale);
+                player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3)));
 			}
 		}
 
@@ -196,7 +197,6 @@ namespace IntWeekGame
 
 			if (Wiimote != null)
 			{
-				//player.XPosition += wm.WiimoteState.AccelState.Values.X * wiiMovementScale;
 				player.Balance += Wiimote.WiimoteState.AccelState.Values.X * wiiBalanceScale;
 			}
 
@@ -223,20 +223,28 @@ namespace IntWeekGame
 			}
 		}
 
-		private void AddRoadMarks()
+		private void SpawnRoadObjects()
 		{
 			if (ScrollSpeed == 0f)
 			{
 				return;
 			}
 
-			roadMarksInterval++;
-			if (roadMarksInterval > (120 / ScrollSpeed))
+			roadMarkSpawnTicker++;
+		    streetLightSpawnTicker++;
+			if (roadMarkSpawnTicker > (120 / ScrollSpeed))
 			{
 				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture) { Origin = new Vector2(((float)roadMarkTexture.Width) / 2, (float)roadMarkTexture.Height), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
 				parallelGameObjectCollection.Add(roadMark);
-				roadMarksInterval = 0;
+				roadMarkSpawnTicker = 0;
 			}
+            if (streetLightSpawnTicker > (300 / ScrollSpeed))
+            {
+                ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90)) };
+                parallelGameObjectCollection.Add(streetLight);
+                streetLightSpawnTicker = 0;
+            }
+
 		}
 
 		/// <summary>

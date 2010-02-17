@@ -183,7 +183,8 @@ namespace IntWeekGame
 			}
 			else
 			{
-                player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3)));
+                //player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3)));
+                player.Balance += (balanceModifier * (balanceScale * 1));
 			}
 		}
 

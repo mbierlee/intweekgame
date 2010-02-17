@@ -58,7 +58,7 @@ namespace IntWeekGame
         {
             if (!Disposing)
             {
-                spriteBatch.Draw(Texture2D, DrawingArea, Color.White);
+                spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White);
             }
         }
         

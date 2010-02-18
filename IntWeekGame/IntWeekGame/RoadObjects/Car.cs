@@ -17,7 +17,7 @@ namespace IntWeekGame.RoadObjects
 {
     public class Car : ParallelGameObject
     {
-        public Car() : base(((IntWeekGame)IntWeekGame.GameInstance).carTexture)
+        public Car() : base(((IntWeekGame)IntWeekGame.GameInstance).CarTexture)
         {
             Speed = 0;
         }

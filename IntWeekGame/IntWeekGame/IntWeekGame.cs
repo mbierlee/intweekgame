@@ -29,11 +29,11 @@ namespace IntWeekGame
 
         private Texture2D backGroundImage;
         private Texture2D roadMarkTexture;
-        public Texture2D streetLightTexture;
-        public Texture2D trashCanTexture;
-        public Texture2D carTexture;
+        public Texture2D StreetLightTexture;
+        public Texture2D TrashCanTexture;
+        public Texture2D CarTexture;
 
-        public static Texture2D pixel;
+        public static Texture2D Pixel;
         public const bool DebugDrawCollisionBoxes = false;
         private readonly Rectangle backgroundRectangle;
         private Random random;
@@ -123,10 +123,10 @@ namespace IntWeekGame
             roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
             //player = new Player(Content.Load<Texture2D>("Sprites/testplayer")) { CollisionMask = new Rectangle(0, 0, 40, 2) };
             player.LoadContent();
-            streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
-            pixel = Content.Load<Texture2D>("pixel");
-            trashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
-            carTexture = Content.Load<Texture2D>("Sprites/auto");
+            StreetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
+            Pixel = Content.Load<Texture2D>("Pixel");
+            TrashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
+            CarTexture = Content.Load<Texture2D>("Sprites/auto");
 
             TestBall = Content.Load<Texture2D>("Sprites/testball");
 
@@ -181,7 +181,6 @@ namespace IntWeekGame
                 return;
             }
 
-            Random random = new Random((int)gameTime.TotalRealTime.Ticks);
             int balanceModificationDirectionChance = random.Next(1, 100);
             if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
             {

@@ -91,7 +91,7 @@ namespace IntWeekGame
 
                 if (IntWeekGame.DebugDrawCollisionBoxes)
                 {
-                    spriteBatch.Draw(IntWeekGame.pixel, CollisionArea, Color.Red);
+                    spriteBatch.Draw(IntWeekGame.Pixel, CollisionArea, Color.Red);
                 }
             }
         }

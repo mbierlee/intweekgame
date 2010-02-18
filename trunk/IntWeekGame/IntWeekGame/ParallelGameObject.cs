@@ -16,7 +16,7 @@ namespace IntWeekGame
 {
     public class ParallelGameObject 
     {
-        public Texture2D Texture2D { get; private set; }
+        public Texture2D Texture2D { get; set; }
         public bool Disposing { get; private set;}
         public bool IsFlat { get; set; }
         public SpriteEffects SpriteEffects { get; set; }

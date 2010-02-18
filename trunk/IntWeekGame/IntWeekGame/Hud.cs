@@ -27,7 +27,7 @@ namespace IntWeekGame
 		private Texture2D hudBalanceTexture;
 		private Rectangle hudBalanceRectangle;
 
-	    public int Score { get; private set; }
+	    public int Score { get; set; }
 
 	    public float Tiredness
 	    {

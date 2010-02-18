@@ -38,11 +38,13 @@ namespace IntWeekGame
 		public Texture2D TrashCanTexture;
 		public Texture2D CarTexture;
 	    public Texture2D BrokenCarTexture;
+	    public Texture2D BeerTexture;
+	    public Texture2D CoffeeTexture;
 
-	    private int score;
-	    private float tiredness;
+	    public int Score { get; set; }
+	    public float Tiredness { get; set; }
 
-		public static Texture2D Pixel;
+	    public static Texture2D Pixel;
 		public const bool DebugDrawCollisionBoxes = false;
 		private readonly Rectangle backgroundRectangle;
 		private Random random;
@@ -100,6 +102,11 @@ namespace IntWeekGame
 			catch { }
 		}
 
+        public void RemoveGameObject(ParallelGameObject parallelGameObject)
+        {
+            parallelGameObjectCollection.Remove(parallelGameObject);
+        }
+
 		public static Game GameInstance { get; private set; }
 
 		/// <summary>
@@ -114,9 +121,12 @@ namespace IntWeekGame
 			parallelGameObjectCollection = new List<ParallelGameObject>();
 			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 			player = new Player { CollisionMask = new Rectangle(0, 0, 38, 2) };
-			this.Components.Add(new Hud(this));
+		    Hud hud = new Hud(this);
+            this.Components.Add(hud);
+            Services.AddService(typeof(Hud), hud);
 			this.Components.Add(new StartScreen(this));
 			this.Components.Add(new GameOver(this));
+            
 
 			base.Initialize();
 		}
@@ -143,8 +153,10 @@ namespace IntWeekGame
 			TrashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
 			CarTexture = Content.Load<Texture2D>("Sprites/auto");
 		    BrokenCarTexture = Content.Load<Texture2D>("Sprites/autokaput");
+		    BeerTexture = Content.Load<Texture2D>("Sprites/bier");
+		    CoffeeTexture = Content.Load<Texture2D>("Sprites/koffie");
 
-			soundFall = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Bounce");
+			soundFall = GameInstance.Content.Load<SoundEffect>("Audio/Bounce");
 
 			// Cheat to getting scenery before the game begins.
 			for (int i = 0; i < (2000 / ScrollSpeed); i++)
@@ -217,6 +229,10 @@ namespace IntWeekGame
 					}
 					break;
 			}
+
+            Hud hud = ((Hud)Services.GetService(typeof(Hud)));
+		    hud.Score = Score;
+		    hud.Tiredness = Tiredness;
 
 			base.Update(gameTime);
 		}
@@ -371,8 +387,6 @@ namespace IntWeekGame
 					{
 						TrashCan trashCan = new TrashCan
 												{
-													CollisionMask = new Rectangle(0, 0, 35, 2),
-													Origin = new Vector2(47, 110),
 													Position = Horizon,
 													Direction = new Vector2(random.Next(-400, 400), 373) / 373
 												};
@@ -383,14 +397,18 @@ namespace IntWeekGame
 					{
 						Car car = new Car
 									  {
-										  Direction = new Vector2(-165, 600) / 600,
-										  Position = Horizon,
-										  Origin = new Vector2(139, 188),
-										  Speed = 5f,
-										  CollisionMask = new Rectangle(0, 0, 139, 2)
+                                          Position = Horizon
 									  };
 
 						parallelGameObjectCollection.Add(car);
+					} else if (typeChance > 50 && typeChance < 55)
+					{
+                        Beer beer = new Beer() { Position = Horizon, Direction = new Vector2(random.Next(-400, 400), 373) / 373 };
+                        parallelGameObjectCollection.Add(beer);
+					} else if (typeChance > 55 && typeChance < 65)
+					{
+                        Coffee coffee = new Coffee() { Position = Horizon, Direction = new Vector2(random.Next(-400, 400), 373) / 373 };
+                        parallelGameObjectCollection.Add(coffee);
 					}
 
 					lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;

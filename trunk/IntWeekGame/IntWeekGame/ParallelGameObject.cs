@@ -14,10 +14,10 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace IntWeekGame
 {
-    public class ParallelGameObject 
+    public class ParallelGameObject
     {
         public Texture2D Texture2D { get; set; }
-        public bool Disposing { get; private set;}
+        public bool Disposing { get; private set; }
         public bool IsFlat { get; set; }
         public SpriteEffects SpriteEffects { get; set; }
         public bool Collidable
@@ -68,7 +68,7 @@ namespace IntWeekGame
         /// </summary>
         public void Update()
         {
-            float scrollSpeed = ((IntWeekGame) IntWeekGame.GameInstance).ScrollSpeed;
+            float scrollSpeed = ((IntWeekGame)IntWeekGame.GameInstance).ScrollSpeed;
 
             scale = Util.GetParallelScaleFromY(Position.Y);
             Position += (Direction * (scale + 0.1f)) * (Speed + scrollSpeed);
@@ -95,7 +95,7 @@ namespace IntWeekGame
                 }
             }
         }
-        
+
         public void Dispose()
         {
             Texture2D.Dispose();

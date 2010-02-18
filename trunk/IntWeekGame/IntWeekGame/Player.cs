@@ -50,7 +50,7 @@ namespace IntWeekGame
             yPosition = 500f;
             scale = Util.GetParallelScaleFromY(yPosition);
             legsOrigin = new Vector2(43, 126);
-            bodyOrigin = new Vector2(123, 133);
+            bodyOrigin = new Vector2(123, 132);
 
             legsTextureDrawArea = new Rectangle(0, 0, 89, 130);
             bodyTextureDrawArea = new Rectangle(0, 0, 243, 138);
@@ -127,6 +127,8 @@ namespace IntWeekGame
 
         public void CheckPlayerCollisionWithObject(ParallelGameObject parallelGameObject)
         {
+            IntWeekGame game = ((IntWeekGame) IntWeekGame.GameInstance);
+
             if (parallelGameObject.Collidable && (
                                                                        parallelGameObject.CollisionArea.Contains(
                                                                            CollisionArea) ||
@@ -135,14 +137,19 @@ namespace IntWeekGame
             {
                 if (parallelGameObject is StreetLight || parallelGameObject is TrashCan)
                 {
-                    ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
+                    game.PlayerHitObstacle();
                 }
                 else if (parallelGameObject is Car)
                 {
-                    ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
+                    game.PlayerHitObstacle();
                     parallelGameObject.Speed = 0;
-                    parallelGameObject.Texture2D = ((IntWeekGame)IntWeekGame.GameInstance).BrokenCarTexture;
+                    parallelGameObject.Texture2D = game.BrokenCarTexture;
                     parallelGameObject.Origin = new Vector2(159, 188);
+                } else if (parallelGameObject is Beer)
+                {
+                    game.Score += 200;
+                    game.Tiredness += 0.2f;
+                    game.RemoveGameObject(parallelGameObject);
                 }
             }
         }

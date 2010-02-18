@@ -12,374 +12,418 @@ using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using WiimoteLib;
 using System.Collections;
-using Point=Microsoft.Xna.Framework.Point;
+using Point = Microsoft.Xna.Framework.Point;
 using IntWeekGame.RoadObjects;
 
 namespace IntWeekGame
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
-    public class IntWeekGame : Microsoft.Xna.Framework.Game
-    {
-        GraphicsDeviceManager graphics;
-        private SpriteBatch standingObjectsSpriteBatch;
-        private SpriteBatch flatObjectsSpriteBatch;
-        private SpriteBatch backgroundBatch;
+	public enum Gamestate { Start, Playing, GameOver };
 
-        private Texture2D backGroundImage;
-        private Texture2D roadMarkTexture;
-        public Texture2D StreetLightTexture;
-        public Texture2D TrashCanTexture;
-        public Texture2D CarTexture;
+	/// <summary>
+	/// This is the main type for your game
+	/// </summary>
+	public class IntWeekGame : Microsoft.Xna.Framework.Game
+	{
+		GraphicsDeviceManager graphics;
 
-        public static Texture2D Pixel;
-        public const bool DebugDrawCollisionBoxes = false;
-        private readonly Rectangle backgroundRectangle;
-        private Random random;
+		private Gamestate gamestate;
 
-        private List<ParallelGameObject> parallelGameObjectCollection;
+		private SpriteBatch standingObjectsSpriteBatch;
+		private SpriteBatch flatObjectsSpriteBatch;
+		private SpriteBatch backgroundBatch;
 
-        private Player player;
+		private Texture2D backGroundImage;
+		private Texture2D roadMarkTexture;
+		public Texture2D StreetLightTexture;
+		public Texture2D TrashCanTexture;
+		public Texture2D CarTexture;
 
-        public Vector2 Horizon;
-        private int roadMarkSpawnTicker;
-        private int streetLightSpawnTicker;
-        public float ScrollSpeed { get; private set; }
-        private Rectangle viewPortRectangle;
+		public static Texture2D Pixel;
+		public const bool DebugDrawCollisionBoxes = false;
+		private readonly Rectangle backgroundRectangle;
+		private Random random;
 
-        public readonly float balanceScale;
-        private readonly float wiiBalanceScale;
+		private List<ParallelGameObject> parallelGameObjectCollection;
 
-        private float balanceModifier;
+		private Player player;
 
-        private KeyboardState keyboardState;
+		public Vector2 Horizon;
+		private int roadMarkSpawnTicker;
+		private int streetLightSpawnTicker;
+		public float ScrollSpeed { get; private set; }
+		private Rectangle viewPortRectangle;
 
-        private double lastObstacleSpawn;
+		public readonly float balanceScale;
+		private readonly float wiiBalanceScale;
 
+		private float balanceModifier;
 
-        private Wiimote Wiimote;
+		private KeyboardState keyboardState;
+
+		private double lastObstacleSpawn;
+
+		private Wiimote Wiimote;
 		private int wiiMoteRumbleState;
 		private DateTime rumbleDateTime;
-		private int wiiMoteRumbleMilliseconds = 500;
+		private int wiiMoteRumbleMilliseconds;
 
-        public IntWeekGame()
-        {
-            balanceScale = 0.01f;
-            wiiBalanceScale = 0.01f;
-            ScrollSpeed = 0.5f;
+		private SoundEffect soundFall;
 
-            GameInstance = this;
 
-            graphics = new GraphicsDeviceManager(this);
-            backgroundRectangle = new Rectangle(0, 0, 800, 600);
+		public IntWeekGame()
+		{
+			gamestate = Gamestate.Start;
 
-            Content.RootDirectory = "Content";
+			balanceScale = 0.01f;
+			wiiBalanceScale = 0.01f;
+			ScrollSpeed = 0.5f;
 
-            Wiimote = new Wiimote();
-            try
-            {
-                Wiimote.Connect();
-                Wiimote.SetReportType(InputReport.IRAccel, true);
+			GameInstance = this;
+
+			graphics = new GraphicsDeviceManager(this);
+			backgroundRectangle = new Rectangle(0, 0, 800, 600);
+
+			Content.RootDirectory = "Content";
+
+			Wiimote = new Wiimote();
+			try
+			{
+				Wiimote.Connect();
+				Wiimote.SetReportType(InputReport.IRAccel, true);
 				wiiMoteRumbleState = 0;
-            }
-            catch { }
-        }
+				wiiMoteRumbleMilliseconds = 500;
+			}
+			catch { }
+		}
 
-        public static Game GameInstance { get; private set; }
+		public static Game GameInstance { get; private set; }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            random = new Random();
-            parallelGameObjectCollection = new List<ParallelGameObject>();
-            viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            player = new Player { CollisionMask = new Rectangle(0, 0, 38, 2) };
-            this.Components.Add(new Hud(this));
+		/// <summary>
+		/// Allows the game to perform any initialization it needs to before starting to run.
+		/// This is where it can query for any required services and load any non-graphic
+		/// related content.  Calling base.Initialize will enumerate through any components
+		/// and initialize them as well.
+		/// </summary>
+		protected override void Initialize()
+		{
+			random = new Random();
+			parallelGameObjectCollection = new List<ParallelGameObject>();
+			viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+			player = new Player { CollisionMask = new Rectangle(0, 0, 38, 2) };
+			this.Components.Add(new Hud(this));
+			this.Components.Add(new StartScreen(this));
+			this.Components.Add(new GameOver(this));
 
-            base.Initialize();
-        }
+			base.Initialize();
+		}
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-        protected override void LoadContent()
-        {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            standingObjectsSpriteBatch = new SpriteBatch(GraphicsDevice);
-            flatObjectsSpriteBatch = new SpriteBatch(GraphicsDevice);
-            backgroundBatch = new SpriteBatch(GraphicsDevice);
+		/// <summary>
+		/// LoadContent will be called once per game and is the place to load
+		/// all of your content.
+		/// </summary>
+		protected override void LoadContent()
+		{
+			// Create a new SpriteBatch, which can be used to draw textures.
+			standingObjectsSpriteBatch = new SpriteBatch(GraphicsDevice);
+			flatObjectsSpriteBatch = new SpriteBatch(GraphicsDevice);
+			backgroundBatch = new SpriteBatch(GraphicsDevice);
 
-            Horizon = new Vector2(((float)graphics.GraphicsDevice.Viewport.Width) / 2, 0);
+			Horizon = new Vector2(((float)graphics.GraphicsDevice.Viewport.Width) / 2, 0);
 
-            backGroundImage = Content.Load<Texture2D>("Backgrounds/bg");
-            roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
-            //player = new Player(Content.Load<Texture2D>("Sprites/testplayer")) { CollisionMask = new Rectangle(0, 0, 40, 2) };
-            player.LoadContent();
-            StreetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
-            Pixel = Content.Load<Texture2D>("Pixel");
-            TrashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
-            CarTexture = Content.Load<Texture2D>("Sprites/auto");
+			backGroundImage = Content.Load<Texture2D>("Backgrounds/bg");
+			roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
+			//player = new Player(Content.Load<Texture2D>("Sprites/testplayer")) { CollisionMask = new Rectangle(0, 0, 40, 2) };
+			player.LoadContent();
+			StreetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
+			Pixel = Content.Load<Texture2D>("Pixel");
+			TrashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
+			CarTexture = Content.Load<Texture2D>("Sprites/auto");
 
-            // Cheat to getting scenery before the game begins.
-            for (int i = 0; i < (2000 / ScrollSpeed); i++)
-            {
-                SpawnRoadObjects(null);
-                UpdateParallelGameObjects();
-            }
+			soundFall = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Bounce");
 
-        }
+			// Cheat to getting scenery before the game begins.
+			for (int i = 0; i < (2000 / ScrollSpeed); i++)
+			{
+				SpawnRoadObjects(null);
+				UpdateParallelGameObjects();
+			}
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
+		}
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
-        {
-            keyboardState = Keyboard.GetState();
+		/// <summary>
+		/// UnloadContent will be called once per game and is the place to unload
+		/// all content.
+		/// </summary>
+		protected override void UnloadContent()
+		{
+			// TODO: Unload any non ContentManager content here
+		}
 
-            SpawnRoadObjects(gameTime);
-            UpdateParallelGameObjects();
+		/// <summary>
+		/// Allows the game to run logic such as updating the world,
+		/// checking for collisions, gathering input, and playing audio.
+		/// </summary>
+		/// <param name="gameTime">Provides a snapshot of timing values.</param>
+		protected override void Update(GameTime gameTime)
+		{
+			keyboardState = Keyboard.GetState();
 
-            ProcessUserInput();
-            player.InfluenceFromBalance();
-            CalculateBalance(gameTime);
+			if (Wiimote.WiimoteState.ButtonState.Home || keyboardState.IsKeyDown(Keys.Escape))
+			{
+				this.Exit();
+			}
 
-            player.Update();
-
-            if (player.Fallen)
-            {
-                ScrollSpeed = 0f;
+			if (player.Fallen)
+			{
 				RumbleWiiMoteUpdate();
-            }
+			}
 
-            base.Update(gameTime);
-        }
+			switch (gamestate)
+			{
+				case Gamestate.Start:
+					if (Wiimote.WiimoteState.ButtonState.A || keyboardState.IsKeyDown(Keys.Enter))
+					{
+						gamestate = Gamestate.Playing;
+					}
+					break;
 
-        private void CalculateBalance(GameTime gameTime)
-        {
-            if (player.Fallen)
-            {
-                return;
-            }
+				case Gamestate.Playing:
+					SpawnRoadObjects(gameTime);
+					UpdateParallelGameObjects();
 
-            int balanceModificationDirectionChance = random.Next(1, 100);
-            if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
-            {
-                balanceModifier = (float)random.NextDouble();
-            }
-            else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
-            {
-                balanceModifier = (float)random.NextDouble() * -1f;
-            }
+					ProcessUserInput();
+					player.InfluenceFromBalance();
+					CalculateBalance(gameTime);
 
-            if (player.Balance == -1f || player.Balance == 1f)
-            {
-                player.Fallen = true;
-				RumbleWiiMote();
-            }
-            else
-            {
-                player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3))) / 2;
-            }
-        }
+					player.Update();
 
-        private void ProcessUserInput()
-        {
-            if (Wiimote.WiimoteState.ButtonState.A)
-            {
-                this.Exit();
-            }
+					if (player.Fallen)
+					{
+						ScrollSpeed = 0f;
+						RumbleWiiMoteUpdate();
+					}
 
-            if (Wiimote != null)
-            {
-                player.Balance += Wiimote.WiimoteState.AccelState.Values.X * wiiBalanceScale;
-            }
+					break;
 
-            if (keyboardState.IsKeyDown(Keys.Left))
-            {
-                player.Balance -= balanceScale;
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right))
-            {
-                player.Balance += balanceScale;
-            }
+				case Gamestate.GameOver:
+					if (Wiimote.WiimoteState.ButtonState.A || keyboardState.IsKeyDown(Keys.Enter))
+					{
+						this.Exit();
+					}
+					break;
+			}
 
-            //Debug input
-            if (keyboardState.IsKeyDown(Keys.F12))
-            {
-                if (ScrollSpeed != 50f)
-                {
-                    ScrollSpeed = 50f;
-                }
-                else
-                {
-                    ScrollSpeed = 0.5f;
-                }
-            }
-        }
+			base.Update(gameTime);
+		}
 
-        private void UpdateParallelGameObjects()
+		private void CalculateBalance(GameTime gameTime)
 		{
 			if (player.Fallen)
 			{
 				return;
 			}
-            for (int i = 0; i < parallelGameObjectCollection.Count; i++)
-            {
-                ParallelGameObject parallelGameObject = parallelGameObjectCollection[i];
 
-                parallelGameObject.Update();
-                if (!viewPortRectangle.Intersects(parallelGameObject.DrawingArea) &&
-                    !viewPortRectangle.Contains(parallelGameObject.DrawingArea))
-                {
-                    parallelGameObjectCollection.Remove(parallelGameObject);
-                }
-                else { player.CheckPlayerCollisionWithObject(parallelGameObject); }
-            }
-        }
+			int balanceModificationDirectionChance = random.Next(1, 100);
+			if (balanceModificationDirectionChance > 10 && balanceModificationDirectionChance < 15)
+			{
+				balanceModifier = (float)random.NextDouble();
+			}
+			else if (balanceModificationDirectionChance > 75 && balanceModificationDirectionChance < 80)
+			{
+				balanceModifier = (float)random.NextDouble() * -1f;
+			}
 
-        internal void PlayerHitObstacle()
-        {
+			if (player.Balance == -1f || player.Balance == 1f)
+			{
+				PlayerFell();
+			}
+			else
+			{
+				player.Balance += (balanceModifier * (balanceScale * random.Next(1, 3))) / 2;
+			}
+		}
+
+		private void ProcessUserInput()
+		{
+			if (Wiimote != null)
+			{
+				player.Balance += Wiimote.WiimoteState.AccelState.Values.X * wiiBalanceScale;
+			}
+
+			if (keyboardState.IsKeyDown(Keys.Left))
+			{
+				player.Balance -= balanceScale;
+			}
+			else if (keyboardState.IsKeyDown(Keys.Right))
+			{
+				player.Balance += balanceScale;
+			}
+
+			//Debug input
+			if (keyboardState.IsKeyDown(Keys.F12))
+			{
+				if (ScrollSpeed != 50f)
+				{
+					ScrollSpeed = 50f;
+				}
+				else
+				{
+					ScrollSpeed = 0.5f;
+				}
+			}
+		}
+
+		private void UpdateParallelGameObjects()
+		{
+			if (player.Fallen)
+			{
+				return;
+			}
+			for (int i = 0; i < parallelGameObjectCollection.Count; i++)
+			{
+				ParallelGameObject parallelGameObject = parallelGameObjectCollection[i];
+
+				parallelGameObject.Update();
+				if (!viewPortRectangle.Intersects(parallelGameObject.DrawingArea) &&
+					!viewPortRectangle.Contains(parallelGameObject.DrawingArea))
+				{
+					parallelGameObjectCollection.Remove(parallelGameObject);
+				}
+				else { player.CheckPlayerCollisionWithObject(parallelGameObject); }
+			}
+		}
+
+		internal void PlayerFell()
+		{
+			soundFall.Play();
+			PlayerHitObstacle();
+		}
+		internal void PlayerHitObstacle()
+		{
 			if (player.Fallen == false)
 			{
 				player.Fallen = true;
 				RumbleWiiMote();
+				gamestate = Gamestate.GameOver;
 			}
-        }
+		}
 
-        private void SpawnRoadObjects(GameTime gameTime)
-        {
-            if (player.Fallen)
-            {
-                return;
-            }
+		private void SpawnRoadObjects(GameTime gameTime)
+		{
+			if (player.Fallen)
+			{
+				return;
+			}
 
-            roadMarkSpawnTicker++;
-            streetLightSpawnTicker++;
-            if (roadMarkSpawnTicker > (120 / ScrollSpeed))
-            {
-                ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture)
-                                                  {
-                                                      IsFlat = true,
-                                                      Origin =
-                                                          new Vector2(((float)roadMarkTexture.Width) / 2,
-                                                                      roadMarkTexture.Height),
-                                                      Position = Horizon,
-                                                      Direction =
-                                                          Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90))
-                                                  };
-                parallelGameObjectCollection.Add(roadMark);
-                roadMarkSpawnTicker = 0;
-            }
+			roadMarkSpawnTicker++;
+			streetLightSpawnTicker++;
+			if (roadMarkSpawnTicker > (120 / ScrollSpeed))
+			{
+				ParallelGameObject roadMark = new ParallelGameObject(roadMarkTexture)
+												  {
+													  IsFlat = true,
+													  Origin =
+														  new Vector2(((float)roadMarkTexture.Width) / 2,
+																	  roadMarkTexture.Height),
+													  Position = Horizon,
+													  Direction =
+														  Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90))
+												  };
+				parallelGameObjectCollection.Add(roadMark);
+				roadMarkSpawnTicker = 0;
+			}
 
-            if (streetLightSpawnTicker > (300 / ScrollSpeed))
-            {
-                StreetLight streetLight = new StreetLight()
-                                              {
-                                                  CollisionMask = new Rectangle(0, 0, 10, 2),
-                                                  Origin = new Vector2(10, 282),
-                                                  Position = Horizon,
-                                                  Direction = new Vector2(-382, 600) / 600
-                                              };
-                StreetLight streetLight2 = new StreetLight()
-                                               {
-                                                   CollisionMask = new Rectangle(0, 0, 10, 2),
-                                                   SpriteEffects = SpriteEffects.FlipHorizontally,
-                                                   Origin = new Vector2(88, 282),
-                                                   Position = Horizon,
-                                                   Direction = new Vector2(382, 600) / 600
-                                               };
-                parallelGameObjectCollection.Add(streetLight);
-                parallelGameObjectCollection.Add(streetLight2);
-                streetLightSpawnTicker = 0;
-            }
+			if (streetLightSpawnTicker > (300 / ScrollSpeed))
+			{
+				StreetLight streetLight = new StreetLight()
+											  {
+												  CollisionMask = new Rectangle(0, 0, 10, 2),
+												  Origin = new Vector2(10, 282),
+												  Position = Horizon,
+												  Direction = new Vector2(-382, 600) / 600
+											  };
+				StreetLight streetLight2 = new StreetLight()
+											   {
+												   CollisionMask = new Rectangle(0, 0, 10, 2),
+												   SpriteEffects = SpriteEffects.FlipHorizontally,
+												   Origin = new Vector2(88, 282),
+												   Position = Horizon,
+												   Direction = new Vector2(382, 600) / 600
+											   };
+				parallelGameObjectCollection.Add(streetLight);
+				parallelGameObjectCollection.Add(streetLight2);
+				streetLightSpawnTicker = 0;
+			}
 
-            if (gameTime != null)
-            {
-                if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
-                {
-                    int typeChance = random.Next(0, 100);
+			if (gameTime != null)
+			{
+				if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
+				{
+					int typeChance = random.Next(0, 100);
 
-                    if (typeChance > 0 && typeChance < 40)
-                    {
-                        TrashCan trashCan = new TrashCan
-                                                {
-                                                    CollisionMask = new Rectangle(0, 0, 54, 2),
-                                                    Origin = new Vector2(43, 99),
-                                                    Position = Horizon,
-                                                    Direction = new Vector2(random.Next(-400, 400), 373) / 373
-                                                };
-                        parallelGameObjectCollection.Add(trashCan);
+					if (typeChance > 0 && typeChance < 40)
+					{
+						TrashCan trashCan = new TrashCan
+												{
+													CollisionMask = new Rectangle(0, 0, 54, 2),
+													Origin = new Vector2(43, 99),
+													Position = Horizon,
+													Direction = new Vector2(random.Next(-400, 400), 373) / 373
+												};
+						parallelGameObjectCollection.Add(trashCan);
 
-                    }
-                    else if (typeChance > 85 && typeChance < 100)
-                    {
-                        Car car = new Car
-                                      {
-                                          Direction = new Vector2(-165, 600) / 600,
-                                          Position = Horizon,
-                                          Origin = new Vector2(142, 189),
-                                          Speed = 5f,
-                                          CollisionMask = new Rectangle(0, 0, 139, 2)
-                                      };
+					}
+					else if (typeChance > 85 && typeChance < 100)
+					{
+						Car car = new Car
+									  {
+										  Direction = new Vector2(-165, 600) / 600,
+										  Position = Horizon,
+										  Origin = new Vector2(142, 189),
+										  Speed = 5f,
+										  CollisionMask = new Rectangle(0, 0, 139, 2)
+									  };
 
-                        parallelGameObjectCollection.Add(car);
-                    }
+						parallelGameObjectCollection.Add(car);
+					}
 
-                    lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
-                }
-            }
-        }
+					lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
+				}
+			}
+		}
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            backgroundBatch.Begin();
-            flatObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Texture, SaveStateMode.None);
-            standingObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.BackToFront, SaveStateMode.None);
+		/// <summary>
+		/// This is called when the game should draw itself.
+		/// </summary>
+		/// <param name="gameTime">Provides a snapshot of timing values.</param>
+		protected override void Draw(GameTime gameTime)
+		{
+			GraphicsDevice.Clear(Color.CornflowerBlue);
+			backgroundBatch.Begin();
+			flatObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Texture, SaveStateMode.None);
+			standingObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.BackToFront, SaveStateMode.None);
 
-            backgroundBatch.Draw(backGroundImage, backgroundRectangle, Color.White);
-            player.Draw(standingObjectsSpriteBatch);
+			backgroundBatch.Draw(backGroundImage, backgroundRectangle, Color.White);
+			player.Draw(standingObjectsSpriteBatch);
 
-            foreach (ParallelGameObject parallelGameObject in parallelGameObjectCollection)
-            {
-                if (parallelGameObject.IsFlat)
-                {
-                    parallelGameObject.Draw(flatObjectsSpriteBatch);
-                }
-                else
-                {
-                    parallelGameObject.Draw(standingObjectsSpriteBatch);
-                }
-            }
+			foreach (ParallelGameObject parallelGameObject in parallelGameObjectCollection)
+			{
+				if (parallelGameObject.IsFlat)
+				{
+					parallelGameObject.Draw(flatObjectsSpriteBatch);
+				}
+				else
+				{
+					parallelGameObject.Draw(standingObjectsSpriteBatch);
+				}
+			}
 
-            backgroundBatch.End();
-            flatObjectsSpriteBatch.End();
-            standingObjectsSpriteBatch.End();
+			backgroundBatch.End();
+			flatObjectsSpriteBatch.End();
+			standingObjectsSpriteBatch.End();
 
-            base.Draw(gameTime);
-        }
+			base.Draw(gameTime);
+		}
 		/// <summary>
 		/// Rumble the WiiMote for a certain duration
 		/// </summary>
@@ -412,5 +456,12 @@ namespace IntWeekGame
 				return player;
 			}
 		}
-    }
+		public Gamestate Gamestate
+		{
+			get
+			{
+				return gamestate;
+			}
+		}
+	}
 }

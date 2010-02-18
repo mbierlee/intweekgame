@@ -90,7 +90,7 @@ namespace IntWeekGame
             }
         }
 
-        public void InfluenceFromBalance ()
+        public void InfluenceFromBalance()
         {
             if (Fallen)
             {
@@ -136,11 +136,13 @@ namespace IntWeekGame
                 if (parallelGameObject is StreetLight || parallelGameObject is TrashCan)
                 {
                     ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
-                } else if (parallelGameObject is Car)
+                }
+                else if (parallelGameObject is Car)
                 {
                     ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
                     parallelGameObject.Speed = 0;
-                    parallelGameObject.Texture2D = ((IntWeekGame) IntWeekGame.GameInstance).BrokenCarTexture;
+                    parallelGameObject.Texture2D = ((IntWeekGame)IntWeekGame.GameInstance).BrokenCarTexture;
+                    parallelGameObject.Origin = new Vector2(159, 188);
                 }
             }
         }

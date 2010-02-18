@@ -28,6 +28,8 @@ namespace IntWeekGame
 		private float scale;
 		public Rectangle CollisionMask { get; set; }
 
+		private SoundEffect soundBurp;
+
 		public Rectangle CollisionArea
 		{
 			get
@@ -50,6 +52,7 @@ namespace IntWeekGame
 		public void LoadContent()
 		{
 			legsTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerlegs_strip15");
+			soundBurp = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Burp");
 		}
 
 		public void Update()
@@ -113,10 +116,12 @@ namespace IntWeekGame
 			{
 				if (parallelGameObject is StreetLight || parallelGameObject is TrashCan)
 				{
+					soundBurp.Play();
 					((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
 				}
 				else if (parallelGameObject is Car)
 				{
+					soundBurp.Play();
 					((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
 					parallelGameObject.Speed = 0;
 				}

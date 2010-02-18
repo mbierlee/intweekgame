@@ -59,13 +59,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\Audio.xap">
-      <Name>Audio</Name>
-      <Importer>XactImporter</Importer>
-      <Processor>XactProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Sprites\straatlantaarn.png">
       <Name>straatlantaarn</Name>
       <Importer>TextureImporter</Importer>
@@ -124,6 +117,28 @@
       <Name>Tiredness</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Audio\BeerOpening.wav">
+      <Name>BeerOpening</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Audio\Bounce.wav">
+      <Name>Bounce</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Audio\Burp.wav">
+      <Name>Burp</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Audio\Swallowing.wav">
+      <Name>Swallowing</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

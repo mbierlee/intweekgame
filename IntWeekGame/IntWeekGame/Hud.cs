@@ -27,8 +27,15 @@ namespace IntWeekGame
 		private Texture2D hudBalanceTexture;
 		private Rectangle hudBalanceRectangle;
 
-		private int score;
-		private float tiredness;
+	    public int Score { get; private set; }
+
+	    public float Tiredness
+	    {
+	        get { return tiredness; }
+            set { tiredness = MathHelper.Clamp(value, 0f, 1f); }
+	    }
+
+	    private float tiredness;
 		private int tirednessOffset;
 		private float balance;
 		private int balanceOffset;
@@ -55,10 +62,7 @@ namespace IntWeekGame
 
 		public override void Update(GameTime gameTime)
 		{
-			score = 80;
-			tiredness = 0.25f;
-
-			tirednessOffset = (int)(182 * tiredness);
+			tirednessOffset = (int)(182 * Tiredness);
 			hudTirednessRectangle = new Rectangle(607, 98, tirednessOffset, 13);
 			hudTirednessSourceRectangle = new Rectangle(182 - tirednessOffset, 0, tirednessOffset, 13);
 
@@ -77,7 +81,7 @@ namespace IntWeekGame
 			{
 				hudBatch.Begin();
 				hudBatch.Draw(hudBackgroundTexture, hudBackgroundRectangle, Color.White);
-				hudBatch.DrawString(hudFont, score.ToString(), new Vector2(735, 42), new Color(51, 51, 51));
+				hudBatch.DrawString(hudFont, Score.ToString(), new Vector2(735, 42), new Color(51, 51, 51));
 
 				hudBatch.Draw(hudTirednessTexture, hudTirednessRectangle, hudTirednessSourceRectangle, Color.White);
 

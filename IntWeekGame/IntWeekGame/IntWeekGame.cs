@@ -37,9 +37,13 @@ namespace IntWeekGame
 		public Texture2D StreetLightTexture;
 		public Texture2D TrashCanTexture;
 		public Texture2D CarTexture;
+	    public Texture2D BrokenCarTexture;
+
+	    //private int score;
+	    //private float tiredness;
 
 		public static Texture2D Pixel;
-		public const bool DebugDrawCollisionBoxes = false;
+		public const bool DebugDrawCollisionBoxes = true;
 		private readonly Rectangle backgroundRectangle;
 		private Random random;
 
@@ -69,7 +73,6 @@ namespace IntWeekGame
 
 		private SoundEffect soundFall;
 
-
 		public IntWeekGame()
 		{
 			gamestate = Gamestate.Start;
@@ -86,6 +89,7 @@ namespace IntWeekGame
 			Content.RootDirectory = "Content";
 
 			Wiimote = new Wiimote();
+
 			try
 			{
 				Wiimote.Connect();
@@ -138,6 +142,7 @@ namespace IntWeekGame
 			Pixel = Content.Load<Texture2D>("Pixel");
 			TrashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
 			CarTexture = Content.Load<Texture2D>("Sprites/auto");
+		    BrokenCarTexture = Content.Load<Texture2D>("Sprites/autokaput");
 
 			soundFall = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Bounce");
 
@@ -365,8 +370,8 @@ namespace IntWeekGame
 					{
 						TrashCan trashCan = new TrashCan
 												{
-													CollisionMask = new Rectangle(0, 0, 54, 2),
-													Origin = new Vector2(43, 99),
+													CollisionMask = new Rectangle(0, 0, 35, 2),
+													Origin = new Vector2(47, 110),
 													Position = Horizon,
 													Direction = new Vector2(random.Next(-400, 400), 373) / 373
 												};

@@ -73,15 +73,18 @@ namespace IntWeekGame
 
 		public override void Draw(GameTime gameTime)
 		{
-			hudBatch.Begin();
-			hudBatch.Draw(hudBackgroundTexture, hudBackgroundRectangle, Color.White);
-			hudBatch.DrawString(hudFont, score.ToString(), new Vector2(735, 42), new Color(51, 51, 51));
+			if (((IntWeekGame)IntWeekGame.GameInstance).Gamestate != Gamestate.Start)
+			{
+				hudBatch.Begin();
+				hudBatch.Draw(hudBackgroundTexture, hudBackgroundRectangle, Color.White);
+				hudBatch.DrawString(hudFont, score.ToString(), new Vector2(735, 42), new Color(51, 51, 51));
 
-			hudBatch.Draw(hudTirednessTexture, hudTirednessRectangle, hudTirednessSourceRectangle, Color.White);
+				hudBatch.Draw(hudTirednessTexture, hudTirednessRectangle, hudTirednessSourceRectangle, Color.White);
 
-			hudBatch.Draw(hudBalanceTexture, hudBalanceRectangle, Color.White);
+				hudBatch.Draw(hudBalanceTexture, hudBalanceRectangle, Color.White);
 
-			hudBatch.End();
+				hudBatch.End();
+			}
 
 			base.Draw(gameTime);
 		}

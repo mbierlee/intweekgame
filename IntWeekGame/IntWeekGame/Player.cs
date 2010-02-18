@@ -19,9 +19,18 @@ namespace IntWeekGame
         private readonly Texture2D playerTexture;
         private readonly Vector2 origin;
         private Vector2 position;
-        private readonly float YPosition;
+        private readonly float yPosition;
         private float balance;
         public bool Fallen { get; set; }
+        private float scale;
+        public Rectangle CollisionMask { get; set; }
+        public Rectangle CollisionArea
+        {
+            get
+            {
+                return new Rectangle((int)((XPosition) - (CollisionMask.Width)), (int)((YPosition) - (CollisionMask.Height)), (int)((CollisionMask.Width) * 2), (int)((CollisionMask.Height) * 2));
+            }
+        }
 
         public Player(Texture2D playerTexture)
         {
@@ -29,7 +38,8 @@ namespace IntWeekGame
 
             this.playerTexture = playerTexture;
             XPosition = (float)game.GraphicsDevice.Viewport.Width / 2;
-            YPosition = 550f;
+            yPosition = 550f;
+            scale = Util.GetParallelScaleFromY(yPosition);
             origin = new Vector2(75, 250);
         }
 
@@ -40,12 +50,22 @@ namespace IntWeekGame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(playerTexture, position - origin, Color.White);
+            spriteBatch.Draw(playerTexture, position - Origin, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1 - scale);
             spriteBatch.Draw(IntWeekGame.testBall, new Vector2((balance * 400) + 400, 0), Color.White);
+
+            if (IntWeekGame.DebugDrawCollisionBoxes)
+            {
+                spriteBatch.Draw(IntWeekGame.pixel, CollisionArea, Color.Red);
+            }
         }
 
         public void InfluenceFromBalance ()
         {
+            if (Fallen)
+            {
+                return;
+            }
+
             XPosition += (4 * Balance);
         }
 
@@ -61,6 +81,16 @@ namespace IntWeekGame
         {
             get { return balance; }
             set { balance = MathHelper.Clamp(value, -1f, 1f); }
+        }
+
+        public float YPosition
+        {
+            get { return yPosition; }
+        }
+
+        public Vector2 Origin
+        {
+            get { return origin; }
         }
     }
 }

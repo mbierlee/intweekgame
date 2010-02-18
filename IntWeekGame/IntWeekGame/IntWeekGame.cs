@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using WiimoteLib;
 using System.Collections;
+using Point=Microsoft.Xna.Framework.Point;
 
 namespace IntWeekGame
 {
@@ -28,6 +29,8 @@ namespace IntWeekGame
 		private Texture2D backGroundImage;
 		private Texture2D roadMarkTexture;
 	    private Texture2D streetLightTexture;
+	    public static Texture2D pixel;
+	    public const bool DebugDrawCollisionBoxes = false;
 		private readonly Rectangle backgroundRectangle;
 
 		private List<ParallelGameObject> parallelGameObjectCollection;
@@ -110,8 +113,9 @@ namespace IntWeekGame
 
 			backGroundImage = Content.Load<Texture2D>("Backgrounds/bg");
 			roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
-			player = new Player(Content.Load<Texture2D>("Sprites/testplayer"));
+            player = new Player(Content.Load<Texture2D>("Sprites/testplayer")) { CollisionMask = new Rectangle(0, 0, 40, 2) };
             streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
+		    pixel = Content.Load<Texture2D>("pixel");
 
 			testBall = Content.Load<Texture2D>("Sprites/testball");
 
@@ -151,6 +155,11 @@ namespace IntWeekGame
 
 			player.Update();
 
+            if (player.Fallen)
+            {
+                ScrollSpeed = 0f;
+            }
+
 			base.Update(gameTime);
 		}
 
@@ -169,8 +178,6 @@ namespace IntWeekGame
 
 			if (player.Balance == -1f || player.Balance == 1f)
 			{
-				ScrollSpeed = 0f;
-
 				if (Wiimote != null)
 				{
 					if (player.Fallen == false)
@@ -214,18 +221,33 @@ namespace IntWeekGame
 			}
 		}
 
-		private void UpdateParallelGameObjects()
-		{
-			for (int i = 0; i < parallelGameObjectCollection.Count; i++)
-			{
-				ParallelGameObject parallelGameObject = parallelGameObjectCollection[i];
-				parallelGameObject.Update();
-				if (!viewPortRectangle.Intersects(parallelGameObject.DrawingArea) && !viewPortRectangle.Contains(parallelGameObject.DrawingArea))
-				{
-					parallelGameObjectCollection.Remove(parallelGameObject);
-				}
-			}
-		}
+        private void UpdateParallelGameObjects()
+        {
+            for (int i = 0; i < parallelGameObjectCollection.Count; i++)
+            {
+                ParallelGameObject parallelGameObject = parallelGameObjectCollection[i];
+
+                parallelGameObject.Update();
+                if (!viewPortRectangle.Intersects(parallelGameObject.DrawingArea) &&
+                    !viewPortRectangle.Contains(parallelGameObject.DrawingArea))
+                {
+                    parallelGameObjectCollection.Remove(parallelGameObject);
+                }
+                else if (parallelGameObject.Collidable && (
+                                                              parallelGameObject.CollisionArea.Contains(
+                                                                  player.CollisionArea) ||
+                                                              parallelGameObject.CollisionArea.Intersects(
+                                                                  player.CollisionArea)))
+                {
+                    PlayerHitObstacle();
+                }
+            }
+        }
+
+	    private void PlayerHitObstacle()
+	    {
+	        player.Fallen = true;
+	    }
 
 	    private void SpawnRoadObjects()
 		{
@@ -245,8 +267,8 @@ namespace IntWeekGame
             
             if (streetLightSpawnTicker > (300 / ScrollSpeed))
             {
-                ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { Origin = new Vector2(10, 282), Position = Horizon, Direction = new Vector2(-382, 600) / 600 };
-                ParallelGameObject streetLight2 = new ParallelGameObject(streetLightTexture) { SpriteEffects = SpriteEffects.FlipHorizontally ,Origin = new Vector2(88, 282), Position = Horizon, Direction = new Vector2(382, 600) / 600 };
+                ParallelGameObject streetLight = new ParallelGameObject(streetLightTexture) { CollisionMask = new Rectangle(0, 0, 10, 2), Collidable = true, Origin = new Vector2(10, 282), Position = Horizon, Direction = new Vector2(-382, 600) / 600 };
+                ParallelGameObject streetLight2 = new ParallelGameObject(streetLightTexture) { CollisionMask = new Rectangle(0, 0, 10, 2), Collidable = true, SpriteEffects = SpriteEffects.FlipHorizontally, Origin = new Vector2(88, 282), Position = Horizon, Direction = new Vector2(382, 600) / 600 };
                 parallelGameObjectCollection.Add(streetLight);
                 parallelGameObjectCollection.Add(streetLight2);
                 streetLightSpawnTicker = 0;
@@ -266,6 +288,7 @@ namespace IntWeekGame
             standingObjectsSpriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.BackToFront, SaveStateMode.None);
 
             backgroundBatch.Draw(backGroundImage, backgroundRectangle, Color.White);
+            player.Draw(standingObjectsSpriteBatch);
 
 			foreach (ParallelGameObject parallelGameObject in parallelGameObjectCollection)
 			{
@@ -277,8 +300,7 @@ namespace IntWeekGame
                     parallelGameObject.Draw(standingObjectsSpriteBatch);
                 }
 			}
-
-            player.Draw(standingObjectsSpriteBatch);
+            
             backgroundBatch.End();
             flatObjectsSpriteBatch.End();
 			standingObjectsSpriteBatch.End();

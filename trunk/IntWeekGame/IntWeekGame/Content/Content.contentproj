@@ -87,13 +87,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fonts\Verdana15.spritefont">
-      <Name>Verdana15</Name>
-      <Importer>FontDescriptionImporter</Importer>
-      <Processor>FontDescriptionProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Fonts\Verdana18Bold.spritefont">
       <Name>Verdana18Bold</Name>
       <Importer>FontDescriptionImporter</Importer>
@@ -124,6 +117,18 @@
   <ItemGroup>
     <Compile Include="Sprites\playerlegs_strip15.png">
       <Name>playerlegs_strip15</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Sprites\Balance.png">
+      <Name>Balance</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Sprites\Tiredness.png">
+      <Name>Tiredness</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

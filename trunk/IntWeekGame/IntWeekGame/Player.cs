@@ -11,10 +11,11 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
+using IntWeekGame.RoadObjects;
 
 namespace IntWeekGame
 {
-    class Player
+    public class Player
     {
         private readonly Texture2D playerTexture;
         private readonly Vector2 origin;
@@ -51,7 +52,7 @@ namespace IntWeekGame
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(playerTexture, position - Origin, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1 - scale);
-            spriteBatch.Draw(IntWeekGame.testBall, new Vector2((balance * 400) + 400, 0), Color.White);
+            spriteBatch.Draw(IntWeekGame.TestBall, new Vector2((balance * 400) + 400, 0), Color.White);
 
             if (IntWeekGame.DebugDrawCollisionBoxes)
             {
@@ -91,6 +92,26 @@ namespace IntWeekGame
         public Vector2 Origin
         {
             get { return origin; }
+        }
+
+
+        public void CheckPlayerCollisionWithObject(ParallelGameObject parallelGameObject)
+        {
+            if (parallelGameObject.Collidable && (
+                                                                       parallelGameObject.CollisionArea.Contains(
+                                                                           CollisionArea) ||
+                                                                       parallelGameObject.CollisionArea.Intersects(
+                                                                           CollisionArea)))
+            {
+                if (parallelGameObject is StreetLight || parallelGameObject is TrashCan)
+                {
+                    ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
+                } else if (parallelGameObject is Car)
+                {
+                    ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
+                    parallelGameObject.Speed = 0;
+                }
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ namespace IntWeekGame.RoadObjects
     class StreetLight : ParallelGameObject
     {
         public StreetLight()
-            : base(((IntWeekGame)IntWeekGame.GameInstance).streetLightTexture)
+            : base(((IntWeekGame)IntWeekGame.GameInstance).StreetLightTexture)
         {
         }
     }

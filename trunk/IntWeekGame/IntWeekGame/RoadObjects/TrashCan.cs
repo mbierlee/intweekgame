@@ -17,7 +17,7 @@ namespace IntWeekGame.RoadObjects
     public class TrashCan : ParallelGameObject
     {
         public TrashCan()
-            : base(((IntWeekGame)IntWeekGame.GameInstance).trashCanTexture)
+            : base(((IntWeekGame)IntWeekGame.GameInstance).TrashCanTexture)
         {
         }
     }

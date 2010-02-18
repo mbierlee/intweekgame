@@ -29,14 +29,9 @@ namespace IntWeekGame
 
 	    public int Score { get; set; }
 
-	    public float Tiredness
-	    {
-	        get { return tiredness; }
-            set { tiredness = MathHelper.Clamp(value, 0f, 1f); }
-	    }
+	    public float Tiredness { get; set; }
 
-	    private float tiredness;
-		private int tirednessOffset;
+	    private int tirednessOffset;
 		private float balance;
 		private int balanceOffset;
 

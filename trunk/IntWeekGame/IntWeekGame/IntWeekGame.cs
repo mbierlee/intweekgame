@@ -42,7 +42,12 @@ namespace IntWeekGame
 	    public Texture2D CoffeeTexture;
 
 	    public int Score { get; set; }
-	    public float Tiredness { get; set; }
+	    private float tiredness;
+	    public float Tiredness
+	    {
+	        get { return tiredness; }
+            set { tiredness = MathHelper.Clamp(value, 0f, 1f); }
+	    }
 
 	    public static Texture2D Pixel;
 		public const bool DebugDrawCollisionBoxes = false;

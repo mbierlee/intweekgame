@@ -55,7 +55,8 @@ namespace IntWeekGame
 
         private KeyboardState keyboardState;
 
-        private GameTime lastTime;
+        private TimeSpan lastObstacleSpawn;
+
 
         private Wiimote Wiimote;
         //private bool rumble;
@@ -66,7 +67,6 @@ namespace IntWeekGame
             balanceScale = 0.01f;
             wiiBalanceScale = 0.01f;
             ScrollSpeed = 0.5f;
-            lastTime = new GameTime();
 
             GameInstance = this;
 
@@ -166,8 +166,6 @@ namespace IntWeekGame
                 ScrollSpeed = 0f;
             }
 
-            lastTime = gameTime;
-
             base.Update(gameTime);
         }
 
@@ -232,6 +230,19 @@ namespace IntWeekGame
             {
                 player.Balance += balanceScale;
             }
+
+            //Debug input
+            if (keyboardState.IsKeyDown(Keys.F12))
+            {
+                if (ScrollSpeed != 50f)
+                {
+                    ScrollSpeed = 50f;
+                }
+                else
+                {
+                    ScrollSpeed = 0.5f;
+                }
+            }
         }
 
         private void UpdateParallelGameObjects()
@@ -267,7 +278,7 @@ namespace IntWeekGame
 
         private void SpawnRoadObjects(GameTime gameTime)
         {
-            if (ScrollSpeed == 0f)
+            if (player.Fallen)
             {
                 return;
             }
@@ -316,12 +327,16 @@ namespace IntWeekGame
 
             if (gameTime != null)
             {
-                // TODO: Timebased spawning
-                Random rand = new Random(gameTime.TotalGameTime.Seconds);
-                if (rand.Next(0, 1000) == 500)
+                // TODO: Fix timebased spawning
+                ///Random rand = new Random(gameTime.TotalGameTime.Seconds);
+                //if (rand.Next(0, 10) == 5)
+                if ((gameTime.TotalGameTime - lastObstacleSpawn).Ticks > 12000)
                 {
-                    TrashCan trashCan = new TrashCan() { Origin = new Vector2(432, 995), Position = Horizon, Direction = new Vector2(200, 600) / 600 };
+                    Random randomPosition = new Random();
+                    TrashCan trashCan = new TrashCan() { Origin = new Vector2(28, 62), Position = Horizon, Direction = new Vector2(randomPosition.Next(-400, 400), 373) / 373 };
                     parallelGameObjectCollection.Add(trashCan);
+
+                    lastObstacleSpawn = gameTime.TotalGameTime;
                 }
             }
         }

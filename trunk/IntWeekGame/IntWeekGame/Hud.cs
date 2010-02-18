@@ -28,9 +28,9 @@ namespace IntWeekGame
 		private Rectangle hudBalanceRectangle;
 
 		private int score;
-		private double tiredness;
+		private float tiredness;
 		private int tirednessOffset;
-		private double balance;
+		private float balance;
 		private int balanceOffset;
 
 		public Hud(Game game)
@@ -56,15 +56,17 @@ namespace IntWeekGame
 		public override void Update(GameTime gameTime)
 		{
 			score = 80;
-			tiredness = 0.25;
-			balance = 1;
+			tiredness = 0.25f;
 
 			tirednessOffset = (int)(182 * tiredness);
 			hudTirednessRectangle = new Rectangle(607, 98, tirednessOffset, 13);
 			hudTirednessSourceRectangle = new Rectangle(182 - tirednessOffset, 0, tirednessOffset, 13);
 
-			balanceOffset = (int)(156 * balance);
-			hudBalanceRectangle = new Rectangle(603 + balanceOffset, 148, 30, 13);
+			balance = ((IntWeekGame)IntWeekGame.GameInstance).Player.Balance;
+			balance = (balance + 1) / 2;
+
+			balanceOffset = (int)(152 * balance); // 186 - 32
+			hudBalanceRectangle = new Rectangle(603 + balanceOffset, 147, 32, 15);
 
 			base.Update(gameTime);
 		}

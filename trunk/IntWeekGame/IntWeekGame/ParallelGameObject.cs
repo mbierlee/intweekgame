@@ -29,6 +29,7 @@ namespace IntWeekGame
             Position = Vector2.Zero;
             Direction = Vector2.Zero;
             SpriteEffects = SpriteEffects.None;
+            CollisionMask = Rectangle.Empty;
         }
 
         public Vector2 Position { get; set; }
@@ -36,7 +37,18 @@ namespace IntWeekGame
         public Vector2 Origin { get; set; }
         public float Speed { get; set; }
         public Rectangle DrawingArea { get; private set; }
-        public int Depth { get; private set; }
+
+        /// <summary>
+        /// Calculated from origin. X and Y properties not needed.
+        /// </summary>
+        public Rectangle CollisionMask { get; set; }
+        public Rectangle CollisionArea
+        {
+            get
+            {
+                return new Rectangle((int)((Position.X) - (CollisionMask.Width * scale)), (int)((Position.Y) - (CollisionMask.Height * scale)), (int)((CollisionMask.Width * scale) * 2), (int)((CollisionMask.Height * scale) * 2));
+            }
+        }
 
         private float scale;
 
@@ -52,8 +64,6 @@ namespace IntWeekGame
 
             DrawingArea = new Rectangle((int)(Position.X - (Origin.X * scale)), (int)(Position.Y - (Origin.Y * scale)),
                                         (int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
-            //DrawingArea = new Rectangle((int)(Position.X), (int)(Position.Y),
-              //                        (int)(Texture2D.Width * scale), (int)(Texture2D.Height * scale));
         }
 
         /// <summary>
@@ -64,7 +74,14 @@ namespace IntWeekGame
         {
             if (!Disposing)
             {
-                spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White, 0, Vector2.Zero, SpriteEffects, 1 - scale);
+                //spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White, 0, Vector2.Zero, SpriteEffects, 1 - scale);
+                spriteBatch.Draw(Texture2D, Position, null, Color.White, 0, Origin, new Vector2(scale),
+                                 SpriteEffects, 1 - scale);
+
+                if (IntWeekGame.DebugDrawCollisionBoxes)
+                {
+                    spriteBatch.Draw(IntWeekGame.pixel, CollisionArea, Color.Red);
+                }
             }
         }
         

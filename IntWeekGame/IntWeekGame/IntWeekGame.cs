@@ -322,7 +322,7 @@ namespace IntWeekGame
                         TrashCan trashCan = new TrashCan
                                                 {
                                                     CollisionMask = new Rectangle(0, 0, 54, 2),
-                                                    Origin = new Vector2(28, 62),
+                                                    Origin = new Vector2(43, 99),
                                                     Position = Horizon,
                                                     Direction = new Vector2(random.Next(-400, 400), 373) / 373
                                                 };

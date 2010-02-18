@@ -61,8 +61,9 @@ namespace IntWeekGame
 
 
         private Wiimote Wiimote;
-        //private bool rumble;
-        private DateTime rumbleDateTime;
+		private int wiiMoteRumbleState;
+		private DateTime rumbleDateTime;
+		private int wiiMoteRumbleMilliseconds = 500;
 
         public IntWeekGame()
         {
@@ -82,7 +83,7 @@ namespace IntWeekGame
             {
                 Wiimote.Connect();
                 Wiimote.SetReportType(InputReport.IRAccel, true);
-                //rumble = false;
+				wiiMoteRumbleState = 0;
             }
             catch { }
         }
@@ -169,6 +170,7 @@ namespace IntWeekGame
             if (player.Fallen)
             {
                 ScrollSpeed = 0f;
+				RumbleWiiMoteUpdate();
             }
 
             base.Update(gameTime);
@@ -193,20 +195,8 @@ namespace IntWeekGame
 
             if (player.Balance == -1f || player.Balance == 1f)
             {
-                if (Wiimote != null)
-                {
-                    if (player.Fallen == false)
-                    {
-                        Wiimote.SetRumble(true);
-                        rumbleDateTime = DateTime.Now;
-                    }
-                    else if (rumbleDateTime != DateTime.MinValue && player.Fallen == true && DateTime.Now.Subtract(rumbleDateTime).Milliseconds > 500)
-                    {
-                        Wiimote.SetRumble(false);
-                        rumbleDateTime = DateTime.MinValue;
-                    }
-                }
                 player.Fallen = true;
+				RumbleWiiMote();
             }
             else
             {
@@ -267,7 +257,11 @@ namespace IntWeekGame
 
         internal void PlayerHitObstacle()
         {
-            player.Fallen = true;
+			if (player.Fallen == false)
+			{
+				player.Fallen = true;
+				RumbleWiiMote();
+			}
         }
 
         private void SpawnRoadObjects(GameTime gameTime)
@@ -386,5 +380,30 @@ namespace IntWeekGame
 
             base.Draw(gameTime);
         }
+		/// <summary>
+		/// Rumble the WiiMote for a certain duration
+		/// </summary>
+		private void RumbleWiiMote()
+		{
+			wiiMoteRumbleState = 1;
+		}
+
+		/// <summary>
+		/// Update Rumble the WiiMote if the timer is set
+		/// </summary>
+		private void RumbleWiiMoteUpdate()
+		{
+			if (wiiMoteRumbleState == 1)
+			{
+				Wiimote.SetRumble(true);
+				rumbleDateTime = DateTime.Now;
+				wiiMoteRumbleState = 2;
+			}
+			else if (wiiMoteRumbleState == 2 && DateTime.Now.Subtract(rumbleDateTime).Milliseconds > wiiMoteRumbleMilliseconds)
+			{
+				Wiimote.SetRumble(false);
+				wiiMoteRumbleState = 0;
+			}
+		}
     }
 }

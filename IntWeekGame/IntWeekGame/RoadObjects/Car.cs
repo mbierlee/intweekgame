@@ -12,13 +12,14 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 
+
 namespace IntWeekGame.RoadObjects
 {
-    public class TrashCan : ParallelGameObject
+    public class Car : ParallelGameObject
     {
-        public TrashCan()
-            : base(((IntWeekGame)IntWeekGame.GameInstance).trashCanTexture)
+        public Car() : base(((IntWeekGame)IntWeekGame.GameInstance).carTexture)
         {
+            Speed = 0;
         }
     }
 }

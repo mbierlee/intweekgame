@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Storage;
 using WiimoteLib;
 using System.Collections;
 using Point=Microsoft.Xna.Framework.Point;
+using IntWeekGame.RoadObjects;
 
 namespace IntWeekGame
 {
@@ -30,15 +31,16 @@ namespace IntWeekGame
         private Texture2D roadMarkTexture;
         public Texture2D streetLightTexture;
         public Texture2D trashCanTexture;
+        public Texture2D carTexture;
 
         public static Texture2D pixel;
         public const bool DebugDrawCollisionBoxes = false;
         private readonly Rectangle backgroundRectangle;
+        private Random random;
 
         private List<ParallelGameObject> parallelGameObjectCollection;
 
         private Player player;
-        //private ParallelGameObject testBall;
 
         public Vector2 Horizon;
         private int roadMarkSpawnTicker;
@@ -46,7 +48,7 @@ namespace IntWeekGame
         public float ScrollSpeed { get; private set; }
         private Rectangle viewPortRectangle;
 
-        public static Texture2D testBall;
+        public static Texture2D TestBall;
 
         private readonly float balanceScale;
         private readonly float wiiBalanceScale;
@@ -55,7 +57,7 @@ namespace IntWeekGame
 
         private KeyboardState keyboardState;
 
-        private TimeSpan lastObstacleSpawn;
+        private double lastObstacleSpawn;
 
 
         private Wiimote Wiimote;
@@ -95,6 +97,7 @@ namespace IntWeekGame
         /// </summary>
         protected override void Initialize()
         {
+            random = new Random();
             parallelGameObjectCollection = new List<ParallelGameObject>();
             viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -122,8 +125,9 @@ namespace IntWeekGame
             streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
             pixel = Content.Load<Texture2D>("pixel");
             trashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
+            carTexture = Content.Load<Texture2D>("Sprites/auto");
 
-            testBall = Content.Load<Texture2D>("Sprites/testball");
+            TestBall = Content.Load<Texture2D>("Sprites/testball");
 
             // Cheat to getting scenery before the game begins.
             for (int i = 0; i < (2000 / ScrollSpeed); i++)
@@ -257,21 +261,11 @@ namespace IntWeekGame
                 {
                     parallelGameObjectCollection.Remove(parallelGameObject);
                 }
-                else if (parallelGameObject.Collidable && (
-                                                              parallelGameObject.CollisionArea.Contains(
-                                                                  player.CollisionArea) ||
-                                                              parallelGameObject.CollisionArea.Intersects(
-                                                                  player.CollisionArea)))
-                {
-                    if (parallelGameObject is StreetLight)
-                    {
-                        PlayerHitObstacle();
-                    }
-                }
+                else { player.CheckPlayerCollisionWithObject(parallelGameObject); }
             }
         }
 
-        private void PlayerHitObstacle()
+        internal void PlayerHitObstacle()
         {
             player.Fallen = true;
         }
@@ -292,7 +286,7 @@ namespace IntWeekGame
                                                       IsFlat = true,
                                                       Origin =
                                                           new Vector2(((float)roadMarkTexture.Width) / 2,
-                                                                      (float)roadMarkTexture.Height),
+                                                                      roadMarkTexture.Height),
                                                       Position = Horizon,
                                                       Direction =
                                                           Util.GetDirectionVectorFromAngle(MathHelper.ToRadians(90))
@@ -306,7 +300,6 @@ namespace IntWeekGame
                 StreetLight streetLight = new StreetLight()
                                               {
                                                   CollisionMask = new Rectangle(0, 0, 10, 2),
-                                                  Collidable = true,
                                                   Origin = new Vector2(10, 282),
                                                   Position = Horizon,
                                                   Direction = new Vector2(-382, 600) / 600
@@ -314,7 +307,6 @@ namespace IntWeekGame
                 StreetLight streetLight2 = new StreetLight()
                                                {
                                                    CollisionMask = new Rectangle(0, 0, 10, 2),
-                                                   Collidable = true,
                                                    SpriteEffects = SpriteEffects.FlipHorizontally,
                                                    Origin = new Vector2(88, 282),
                                                    Position = Horizon,
@@ -327,16 +319,37 @@ namespace IntWeekGame
 
             if (gameTime != null)
             {
-                // TODO: Fix timebased spawning
-                ///Random rand = new Random(gameTime.TotalGameTime.Seconds);
-                //if (rand.Next(0, 10) == 5)
-                if ((gameTime.TotalGameTime - lastObstacleSpawn).Ticks > 12000)
+                if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
                 {
-                    Random randomPosition = new Random();
-                    TrashCan trashCan = new TrashCan() { Origin = new Vector2(28, 62), Position = Horizon, Direction = new Vector2(randomPosition.Next(-400, 400), 373) / 373 };
-                    parallelGameObjectCollection.Add(trashCan);
+                    int typeChance = random.Next(0, 100);
 
-                    lastObstacleSpawn = gameTime.TotalGameTime;
+                    if (typeChance > 0 && typeChance < 40)
+                    {
+                        TrashCan trashCan = new TrashCan
+                                                {
+                                                    CollisionMask = new Rectangle(0, 0, 54, 2),
+                                                    Origin = new Vector2(28, 62),
+                                                    Position = Horizon,
+                                                    Direction = new Vector2(random.Next(-400, 400), 373) / 373
+                                                };
+                        parallelGameObjectCollection.Add(trashCan);
+
+                    }
+                    else if (typeChance > 85 && typeChance < 100)
+                    {
+                        Car car = new Car
+                                      {
+                                          Direction = new Vector2(-165, 600) / 600,
+                                          Position = Horizon,
+                                          Origin = new Vector2(142, 189),
+                                          Speed = 5f,
+                                          CollisionMask = new Rectangle(0, 0, 139, 2)
+                                      };
+
+                        parallelGameObjectCollection.Add(car);
+                    }
+
+                    lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
                 }
             }
         }

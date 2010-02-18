@@ -20,7 +20,17 @@ namespace IntWeekGame
         public bool Disposing { get; private set;}
         public bool IsFlat { get; set; }
         public SpriteEffects SpriteEffects { get; set; }
-        public bool Collidable { get; set; }
+        public bool Collidable
+        {
+            get
+            {
+                if (CollisionMask != Rectangle.Empty)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
 
         public ParallelGameObject(Texture2D texture2D)
         {
@@ -30,6 +40,7 @@ namespace IntWeekGame
             Direction = Vector2.Zero;
             SpriteEffects = SpriteEffects.None;
             CollisionMask = Rectangle.Empty;
+            Origin = new Vector2(0, 0);
         }
 
         public Vector2 Position { get; set; }

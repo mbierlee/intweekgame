@@ -100,7 +100,7 @@ namespace IntWeekGame
             random = new Random();
             parallelGameObjectCollection = new List<ParallelGameObject>();
             viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-
+            player = new Player { CollisionMask = new Rectangle(0, 0, 55, 2) };
             this.Components.Add(new Hud(this));
 
             base.Initialize();
@@ -121,7 +121,8 @@ namespace IntWeekGame
 
             backGroundImage = Content.Load<Texture2D>("Backgrounds/bg");
             roadMarkTexture = Content.Load<Texture2D>("Sprites/RoadMark");
-            player = new Player(Content.Load<Texture2D>("Sprites/testplayer")) { CollisionMask = new Rectangle(0, 0, 40, 2) };
+            //player = new Player(Content.Load<Texture2D>("Sprites/testplayer")) { CollisionMask = new Rectangle(0, 0, 40, 2) };
+            player.LoadContent();
             streetLightTexture = Content.Load<Texture2D>("Sprites/straatlantaarn");
             pixel = Content.Load<Texture2D>("pixel");
             trashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");

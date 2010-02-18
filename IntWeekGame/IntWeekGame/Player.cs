@@ -17,7 +17,9 @@ namespace IntWeekGame
 {
     public class Player
     {
-        private readonly Texture2D playerTexture;
+        private Texture2D legsTextureStrip;
+        private Texture2D bodyTextureStrip;
+
         private readonly Vector2 origin;
         private Vector2 position;
         private readonly float yPosition;
@@ -25,23 +27,29 @@ namespace IntWeekGame
         public bool Fallen { get; set; }
         private float scale;
         public Rectangle CollisionMask { get; set; }
+
         public Rectangle CollisionArea
         {
             get
             {
-                return new Rectangle((int)((XPosition) - (CollisionMask.Width)), (int)((YPosition) - (CollisionMask.Height)), (int)((CollisionMask.Width) * 2), (int)((CollisionMask.Height) * 2));
+                return new Rectangle((int)((XPosition) - (CollisionMask.Width * scale)), (int)((YPosition) - (CollisionMask.Height * scale)), (int)((CollisionMask.Width * scale) * 2), (int)((CollisionMask.Height * scale) * 2));
             }
         }
 
-        public Player(Texture2D playerTexture)
+        public Player()
         {
             IntWeekGame game = (IntWeekGame)IntWeekGame.GameInstance;
 
-            this.playerTexture = playerTexture;
             XPosition = (float)game.GraphicsDevice.Viewport.Width / 2;
-            yPosition = 550f;
+            //yPosition = 550f;
+            yPosition = 500f;
             scale = Util.GetParallelScaleFromY(yPosition);
-            origin = new Vector2(75, 250);
+            origin = new Vector2(53, 154);
+        }
+
+        public void LoadContent()
+        {
+            legsTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerlegs_strip15");
         }
 
         public void Update()
@@ -51,7 +59,8 @@ namespace IntWeekGame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(playerTexture, position - Origin, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1 - scale);
+            Rectangle legsTextureDrawArea = new Rectangle(0, 0, 110, 160);
+            spriteBatch.Draw(legsTextureStrip, position, legsTextureDrawArea, Color.White, 0, Origin, scale, SpriteEffects.None, 1 - scale);
             spriteBatch.Draw(IntWeekGame.TestBall, new Vector2((balance * 400) + 400, 0), Color.White);
 
             if (IntWeekGame.DebugDrawCollisionBoxes)

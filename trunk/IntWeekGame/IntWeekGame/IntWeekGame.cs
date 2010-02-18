@@ -99,7 +99,7 @@ namespace IntWeekGame
             random = new Random();
             parallelGameObjectCollection = new List<ParallelGameObject>();
             viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            player = new Player { CollisionMask = new Rectangle(0, 0, 55, 2) };
+            player = new Player { CollisionMask = new Rectangle(0, 0, 38, 2) };
             this.Components.Add(new Hud(this));
 
             base.Initialize();

@@ -150,6 +150,11 @@ namespace IntWeekGame
                     game.Score += 200;
                     game.Tiredness += 0.2f;
                     game.RemoveGameObject(parallelGameObject);
+                } else if (parallelGameObject is Coffee)
+                {
+                    game.Score += 50;
+                    game.Tiredness -= 0.5f;
+                    game.RemoveGameObject(parallelGameObject);
                 }
             }
         }

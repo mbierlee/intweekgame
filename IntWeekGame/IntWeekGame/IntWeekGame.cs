@@ -236,7 +236,11 @@ namespace IntWeekGame
         }
 
         private void UpdateParallelGameObjects()
-        {
+		{
+			if (player.Fallen)
+			{
+				return;
+			}
             for (int i = 0; i < parallelGameObjectCollection.Count; i++)
             {
                 ParallelGameObject parallelGameObject = parallelGameObjectCollection[i];

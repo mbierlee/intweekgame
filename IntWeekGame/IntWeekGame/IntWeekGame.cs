@@ -39,11 +39,11 @@ namespace IntWeekGame
 		public Texture2D CarTexture;
 	    public Texture2D BrokenCarTexture;
 
-	    //private int score;
-	    //private float tiredness;
+	    private int score;
+	    private float tiredness;
 
 		public static Texture2D Pixel;
-		public const bool DebugDrawCollisionBoxes = true;
+		public const bool DebugDrawCollisionBoxes = false;
 		private readonly Rectangle backgroundRectangle;
 		private Random random;
 
@@ -303,6 +303,7 @@ namespace IntWeekGame
 			soundFall.Play();
 			PlayerHitObstacle();
 		}
+
 		internal void PlayerHitObstacle()
 		{
 			if (player.Fallen == false)

@@ -140,6 +140,7 @@ namespace IntWeekGame
                 {
                     ((IntWeekGame)IntWeekGame.GameInstance).PlayerHitObstacle();
                     parallelGameObject.Speed = 0;
+                    parallelGameObject.Texture2D = ((IntWeekGame) IntWeekGame.GameInstance).BrokenCarTexture;
                 }
             }
         }

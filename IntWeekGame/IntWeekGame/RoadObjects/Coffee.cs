@@ -14,13 +14,13 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace IntWeekGame.RoadObjects
 {
-    public class TrashCan : ParallelGameObject
+    class Coffee : ParallelGameObject
     {
-        public TrashCan()
-            : base(((IntWeekGame)IntWeekGame.GameInstance).TrashCanTexture)
+        public Coffee()
+            : base(((IntWeekGame)IntWeekGame.GameInstance).CoffeeTexture)
         {
-            CollisionMask = new Rectangle(0, 0, 35, 2);
-            Origin = new Vector2(47, 110);
+            Origin = new Vector2(12, 23);
+            CollisionMask = new Rectangle(0, 0, 12, 2);
         }
     }
 }

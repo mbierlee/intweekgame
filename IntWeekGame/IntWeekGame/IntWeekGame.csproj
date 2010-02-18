@@ -92,7 +92,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="IntWeekGame.cs" />
+    <Compile Include="RoadObjects\Beer.cs" />
     <Compile Include="RoadObjects\Car.cs" />
+    <Compile Include="RoadObjects\Coffee.cs" />
     <Compile Include="RoadObjects\StreetLight.cs" />
     <Compile Include="RoadObjects\TrashCan.cs" />
     <Compile Include="StartScreen.cs" />

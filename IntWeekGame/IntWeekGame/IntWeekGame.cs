@@ -48,9 +48,7 @@ namespace IntWeekGame
         public float ScrollSpeed { get; private set; }
         private Rectangle viewPortRectangle;
 
-        public static Texture2D TestBall;
-
-        private readonly float balanceScale;
+        public readonly float balanceScale;
         private readonly float wiiBalanceScale;
 
         private float balanceModifier;
@@ -128,8 +126,6 @@ namespace IntWeekGame
             Pixel = Content.Load<Texture2D>("Pixel");
             TrashCanTexture = Content.Load<Texture2D>("Sprites/Trashcan");
             CarTexture = Content.Load<Texture2D>("Sprites/auto");
-
-            TestBall = Content.Load<Texture2D>("Sprites/testball");
 
             // Cheat to getting scenery before the game begins.
             for (int i = 0; i < (2000 / ScrollSpeed); i++)
@@ -403,6 +399,13 @@ namespace IntWeekGame
 			{
 				Wiimote.SetRumble(false);
 				wiiMoteRumbleState = 0;
+			}
+		}
+		public Player Player
+		{
+			get
+			{
+				return player;
 			}
 		}
     }

@@ -67,7 +67,8 @@ namespace IntWeekGame
             gamestate = Gamestate.Start;
 
             balanceScale = 0.01f;
-            wiiBalanceScale = 0.01f;
+            //wiiBalanceScale = 0.01f;
+            wiiBalanceScale = 1f;
             DefaultScrollSpeed =1.0f;
             ScrollSpeed = DefaultScrollSpeed;
 

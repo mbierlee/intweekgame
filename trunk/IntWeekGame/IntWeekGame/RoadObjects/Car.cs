@@ -32,7 +32,7 @@ namespace IntWeekGame.RoadObjects
             {
                 dirmod += dirscale;
                 Direction = new Vector2(dirmod, 600)/600;
-                if (dirmod > 400 || dirmod < -400)
+                if (dirmod > 300 || dirmod < -300)
                 {
                     dirscale *= -1;
                 }

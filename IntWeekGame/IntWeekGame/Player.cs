@@ -153,7 +153,7 @@ namespace IntWeekGame
                 } else if (parallelGameObject is Coffee)
                 {
                     game.Score += 50;
-                    game.Tiredness -= 0.5f;
+                    game.Tiredness -= 0.3f;
                     game.RemoveGameObject(parallelGameObject);
                 }
             }

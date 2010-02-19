@@ -32,7 +32,8 @@ namespace IntWeekGame
 			screenFont = this.Game.Content.Load<SpriteFont>("Fonts/Verdana18Bold");
 
 			screenBackgroundTexture = this.Game.Content.Load<Texture2D>("Backgrounds/StartScreen");
-			screenBackgroundRectangle = new Rectangle(9, 13, 782, 575);
+			//screenBackgroundRectangle = new Rectangle(9, 13, 782, 575);
+            screenBackgroundRectangle = new Rectangle(0, 0, 800, 600);
 
 			base.LoadContent();
 		}

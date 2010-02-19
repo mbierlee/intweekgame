@@ -132,7 +132,6 @@ namespace IntWeekGame
 			this.Components.Add(new StartScreen(this));
 			this.Components.Add(new GameOver(this));
             
-
 			base.Initialize();
 		}
 
@@ -164,15 +163,20 @@ namespace IntWeekGame
 			soundFall = GameInstance.Content.Load<SoundEffect>("Audio/Bounce");
 
 			// Cheat to getting scenery before the game begins.
-			for (int i = 0; i < (2000 / ScrollSpeed); i++)
-			{
-				SpawnRoadObjects(null);
-				UpdateParallelGameObjects();
-			}
+			PrepareScenery();
 
 		}
 
-		/// <summary>
+	    private void PrepareScenery()
+	    {
+	        for (int i = 0; i < (2000 / ScrollSpeed); i++)
+	        {
+	            SpawnRoadObjects(null);
+	            UpdateParallelGameObjects();
+	        }
+	    }
+
+	    /// <summary>
 		/// UnloadContent will be called once per game and is the place to unload
 		/// all content.
 		/// </summary>
@@ -203,7 +207,7 @@ namespace IntWeekGame
 			switch (gamestate)
 			{
 				case Gamestate.Start:
-					if (Wiimote.WiimoteState.ButtonState.A || keyboardState.IsKeyDown(Keys.Enter))
+                    if (Wiimote.WiimoteState.ButtonState.A || keyboardState.IsKeyDown(Keys.Enter) || keyboardState.IsKeyDown(Keys.A))
 					{
 						gamestate = Gamestate.Playing;
 					}
@@ -228,9 +232,10 @@ namespace IntWeekGame
 					break;
 
 				case Gamestate.GameOver:
-					if (Wiimote.WiimoteState.ButtonState.A || keyboardState.IsKeyDown(Keys.Enter))
+                    if (Wiimote.WiimoteState.ButtonState.A || keyboardState.IsKeyDown(Keys.Enter) || keyboardState.IsKeyDown(Keys.A))
 					{
-						this.Exit();
+						//this.Exit();
+                        RestartSession();
 					}
 					break;
 			}
@@ -318,6 +323,20 @@ namespace IntWeekGame
 				else { player.CheckPlayerCollisionWithObject(parallelGameObject); }
 			}
 		}
+
+	    public void RestartSession()
+	    {
+	        Score = 0;
+	        Tiredness = 0f;
+            parallelGameObjectCollection.Clear();
+	        player.XPosition = Horizon.X;
+            player.Fallen = false;
+            player.Balance = 0f;
+	        balanceModifier = 0f;
+	        ScrollSpeed = 0.5f;
+	        PrepareScenery();
+	        gamestate = Gamestate.Playing;
+	    }
 
 		internal void PlayerFell()
 		{
@@ -417,11 +436,19 @@ namespace IntWeekGame
 					}
 
 					lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
+
+				    AddScoreAndTiredness();
 				}
 			}
 		}
 
-		/// <summary>
+	    private void AddScoreAndTiredness()
+	    {
+	        Score++;
+	        tiredness += 0.01f;
+	    }
+
+	    /// <summary>
 		/// This is called when the game should draw itself.
 		/// </summary>
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>

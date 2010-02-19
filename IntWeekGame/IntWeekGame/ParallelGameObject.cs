@@ -5,7 +5,7 @@ namespace IntWeekGame
 {
     public class ParallelGameObject
     {
-        private float scale;
+        public float Scale { get; private set; }
 
         public ParallelGameObject(Texture2D texture2D)
         {
@@ -50,37 +50,37 @@ namespace IntWeekGame
         {
             get
             {
-                return new Rectangle((int) ((Position.X) - (CollisionMask.Width*scale)),
-                                     (int) ((Position.Y) - (CollisionMask.Height*scale)),
-                                     (int) ((CollisionMask.Width*scale)*2), (int) ((CollisionMask.Height*scale)*2));
+                return new Rectangle((int) ((Position.X) - (CollisionMask.Width*Scale)),
+                                     (int) ((Position.Y) - (CollisionMask.Height*Scale)),
+                                     (int) ((CollisionMask.Width*Scale)*2), (int) ((CollisionMask.Height*Scale)*2));
             }
         }
 
         /// <summary>
         /// Updates the game logic.
         /// </summary>
-        public void Update()
+        public virtual void Update()
         {
             float scrollSpeed = ((IntWeekGame) IntWeekGame.GameInstance).ScrollSpeed;
 
-            scale = Util.GetParallelScaleFromY(Position.Y);
-            Position += (Direction*(scale + 0.1f))*(Speed + scrollSpeed);
+            Scale = Util.GetParallelScaleFromY(Position.Y);
+            Position += (Direction*(Scale + 0.1f))*(Speed + scrollSpeed);
 
-            DrawingArea = new Rectangle((int) (Position.X - (Origin.X*scale)), (int) (Position.Y - (Origin.Y*scale)),
-                                        (int) (Texture2D.Width*scale), (int) (Texture2D.Height*scale));
+            DrawingArea = new Rectangle((int) (Position.X - (Origin.X*Scale)), (int) (Position.Y - (Origin.Y*Scale)),
+                                        (int) (Texture2D.Width*Scale), (int) (Texture2D.Height*Scale));
         }
 
         /// <summary>
         /// Drawns the object onto the given sprite batch.
         /// </summary>
         /// <param name="spriteBatch">Spritebatch that draws this object.</param>
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             if (!Disposing)
             {
                 //spriteBatch.Draw(Texture2D, DrawingArea, null, Color.White, 0, Vector2.Zero, SpriteEffects, 1 - scale);
-                spriteBatch.Draw(Texture2D, Position, null, Color.White, 0, Origin, new Vector2(scale),
-                                 SpriteEffects, 1 - scale);
+                spriteBatch.Draw(Texture2D, Position, null, Color.White, 0, Origin, new Vector2(Scale),
+                                 SpriteEffects, 1 - Scale);
 
                 /*
                 if (IntWeekGame.DebugDrawCollisionBoxes)

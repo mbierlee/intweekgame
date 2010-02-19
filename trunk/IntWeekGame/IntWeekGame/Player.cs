@@ -78,8 +78,8 @@ namespace IntWeekGame
         public void LoadContent()
         {
             legsTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerlegs_strip15");
-            bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
-            //bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/testplayer");
+            //bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
+            bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/testplayer");
             fallenPlayer = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/FallenPlayer");
 
 			soundBeer = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Beer");

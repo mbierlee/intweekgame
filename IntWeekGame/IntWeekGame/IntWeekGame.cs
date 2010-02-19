@@ -54,6 +54,7 @@ namespace IntWeekGame
         private int streetLightSpawnTicker;
         public Texture2D StreetLightTexture;
         private float tiredness;
+        private readonly float DefaultScrollSpeed;
         public Texture2D TrashCanTexture;
         private Rectangle viewPortRectangle;
 
@@ -67,7 +68,8 @@ namespace IntWeekGame
 
             balanceScale = 0.01f;
             wiiBalanceScale = 0.01f;
-            ScrollSpeed = 0.5f;
+            DefaultScrollSpeed =1.0f;
+            ScrollSpeed = DefaultScrollSpeed;
 
             GameInstance = this;
 
@@ -355,7 +357,7 @@ namespace IntWeekGame
             player.Fallen = false;
             player.Balance = 0f;
             balanceModifier = 0f;
-            ScrollSpeed = 0.5f;
+            ScrollSpeed = DefaultScrollSpeed;
             PrepareScenery();
             var hud = (Hud) Services.GetService(typeof (Hud));
             hud.Visible = true;
@@ -429,7 +431,7 @@ namespace IntWeekGame
 
             if (gameTime != null)
             {
-                if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
+                if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 1)
                 {
                     SpawnObstacle(true);
 
@@ -447,7 +449,7 @@ namespace IntWeekGame
         {
             int typeChance = random.Next(0, 100);
 
-            if (typeChance > 10 && typeChance < 20)
+            if (typeChance > 0 && typeChance < 20)
             {
                 var trashCan = new TrashCan
                                    {

@@ -49,7 +49,7 @@ namespace IntWeekGame
         private int roadMarkSpawnTicker;
         private Texture2D roadMarkTexture;
         private DateTime rumbleDateTime;
-        private SoundEffect soundFall;
+		private SoundEffect soundGameOver;
         private SpriteBatch standingObjectsSpriteBatch;
         private int streetLightSpawnTicker;
         public Texture2D StreetLightTexture;
@@ -168,7 +168,7 @@ namespace IntWeekGame
             CoffeeTexture = Content.Load<Texture2D>("Sprites/koffie");
             KnockedOverTrashCanTexture = Content.Load<Texture2D>("Sprites/TrashcanKnockedOver");
 
-            soundFall = GameInstance.Content.Load<SoundEffect>("Audio/Burp");
+            soundGameOver = GameInstance.Content.Load<SoundEffect>("Audio/GameOver");
 
             // Cheat to getting scenery before the game begins.
             PrepareScenery();
@@ -367,7 +367,7 @@ namespace IntWeekGame
 
         private void PlayerFell()
         {
-            soundFall.Play();
+			soundGameOver.Play();
             PlayerHitObstacle();
         }
 

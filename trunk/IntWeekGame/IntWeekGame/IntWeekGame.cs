@@ -424,41 +424,51 @@ namespace IntWeekGame
             {
                 if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
                 {
-                    int typeChance = random.Next(0, 100);
-
-                    if (typeChance > 0 && typeChance < 40)
-                    {
-                        var trashCan = new TrashCan
-                                           {
-                                               Position = Horizon,
-                                               Direction = new Vector2(random.Next(-400, 400), 373)/373
-                                           };
-                        parallelGameObjectCollection.Add(trashCan);
-                    }
-                    else if (typeChance > 85 && typeChance < 100)
-                    {
-                        var car = new Car
-                                      {
-                                          Position = Horizon
-                                      };
-
-                        parallelGameObjectCollection.Add(car);
-                    }
-                    else if (typeChance > 50 && typeChance < 55)
-                    {
-                        var beer = new Beer {Position = Horizon, Direction = new Vector2(random.Next(-400, 400), 373)/373};
-                        parallelGameObjectCollection.Add(beer);
-                    }
-                    else if (typeChance > 55 && typeChance < 65)
-                    {
-                        var coffee = new Coffee {Position = Horizon, Direction = new Vector2(random.Next(-400, 400), 373)/373};
-                        parallelGameObjectCollection.Add(coffee);
-                    }
+                    SpawnObstacles();
 
                     lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
 
-                    AddScoreAndTiredness();
+                    if (gamestate == Gamestate.Start)
+                    {
+                        AddScoreAndTiredness();
+                    }
                 }
+            }
+        }
+
+        private void SpawnObstacles()
+        {
+            int typeChance = random.Next(0, 100);
+
+            if (typeChance > 0 && typeChance < 40)
+            {
+                var trashCan = new TrashCan
+                                   {
+                                       Position = Horizon,
+                                       Direction = new Vector2(random.Next(-400, 400), 373)/373
+                                   };
+                parallelGameObjectCollection.Add(trashCan);
+            }
+            else if (typeChance > 85 && typeChance < 100)
+            {
+                var car = new Car
+                              {
+                                  Position = Horizon
+                              };
+
+                parallelGameObjectCollection.Add(car);
+            }
+            else if (typeChance > 50 && typeChance < 55)
+            {
+                var beer = new Beer
+                               {Position = Horizon, Direction = new Vector2(random.Next(-400, 400), 373)/373};
+                parallelGameObjectCollection.Add(beer);
+            }
+            else if (typeChance > 55 && typeChance < 65)
+            {
+                var coffee = new Coffee
+                                 {Position = Horizon, Direction = new Vector2(random.Next(-400, 400), 373)/373};
+                parallelGameObjectCollection.Add(coffee);
             }
         }
 

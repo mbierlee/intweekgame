@@ -27,7 +27,6 @@ namespace IntWeekGame
             var game = (IntWeekGame) IntWeekGame.GameInstance;
 
             XPosition = (float) game.GraphicsDevice.Viewport.Width/2;
-            //yPosition = 550f;
             yPosition = 500f;
             scale = Util.GetParallelScaleFromY(yPosition);
             legsOrigin = new Vector2(43, 126);
@@ -76,7 +75,8 @@ namespace IntWeekGame
         public void LoadContent()
         {
             legsTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerlegs_strip15");
-            bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
+            //bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
+            bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/testplayer");
             fallenPlayer = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/FallenPlayer");
         }
 
@@ -145,7 +145,7 @@ namespace IntWeekGame
         {
             var game = ((IntWeekGame) IntWeekGame.GameInstance);
 
-            if (parallelGameObject.Collidable && (
+            if (!Fallen && parallelGameObject.Collidable && (
                                                      parallelGameObject.CollisionArea.Contains(
                                                          CollisionArea) ||
                                                      parallelGameObject.CollisionArea.Intersects(

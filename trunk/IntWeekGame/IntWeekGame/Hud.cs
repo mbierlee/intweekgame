@@ -1,16 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace IntWeekGame
 {
     internal class Hud : DrawableGameComponent
     {
         private float balance;
-        private int balanceOffset;
+        private float balanceOffset;
         private Rectangle hudBackgroundRectangle;
         private Texture2D hudBackgroundTexture;
-        private Rectangle hudBalanceRectangle;
-        private Texture2D hudBalanceTexture;
+        private Rectangle hudBalanceRectangle, hudBalanceIndicatorRectangle;
+        private Texture2D hudBalanceTexture, hudBalanceIndicatorTexture;
         private SpriteBatch hudBatch;
         private SpriteFont hudFont;
 
@@ -34,11 +35,12 @@ namespace IntWeekGame
             hudFont = Game.Content.Load<SpriteFont>("Fonts/Verdana18Bold");
 
             hudBackgroundTexture = Game.Content.Load<Texture2D>("Backgrounds/hud");
-            hudBackgroundRectangle = new Rectangle(600, 15, 192, 162);
+            hudBackgroundRectangle = new Rectangle(600, 15, 192, 122);
 
             hudTirednessTexture = Game.Content.Load<Texture2D>("Sprites/Tiredness");
 
-            hudBalanceTexture = Game.Content.Load<Texture2D>("Sprites/Balance");
+			hudBalanceTexture = Game.Content.Load<Texture2D>("Sprites/Balance");
+			hudBalanceIndicatorTexture = Game.Content.Load<Texture2D>("Sprites/BalanceIndicator");
 
             base.LoadContent();
         }
@@ -46,14 +48,16 @@ namespace IntWeekGame
         public override void Update(GameTime gameTime)
         {
             tirednessOffset = (int) (182*Tiredness);
-            hudTirednessRectangle = new Rectangle(607, 98, tirednessOffset, 13);
+            hudTirednessRectangle = new Rectangle(607, 102, tirednessOffset, 13);
             hudTirednessSourceRectangle = new Rectangle(182 - tirednessOffset, 0, tirednessOffset, 13);
 
             balance = ((IntWeekGame) IntWeekGame.GameInstance).Player.Balance;
             balance = (balance + 1)/2;
 
-            balanceOffset = (int) (152*balance); // 186 - 32
-            hudBalanceRectangle = new Rectangle(603 + balanceOffset, 147, 32, 15);
+			float playerOffset = ((IntWeekGame)IntWeekGame.GameInstance).Player.XPosition - 111;
+            balanceOffset = 160*balance; // 186 - 62
+			hudBalanceRectangle = new Rectangle(Convert.ToInt32(playerOffset), 515, 222, 17);
+			hudBalanceIndicatorRectangle = new Rectangle(Convert.ToInt32(playerOffset + balanceOffset), 500, 62, 47);
 
             base.Update(gameTime);
         }
@@ -68,7 +72,8 @@ namespace IntWeekGame
 
                 hudBatch.Draw(hudTirednessTexture, hudTirednessRectangle, hudTirednessSourceRectangle, Color.White);
 
-                hudBatch.Draw(hudBalanceTexture, hudBalanceRectangle, Color.White);
+				hudBatch.Draw(hudBalanceTexture, hudBalanceRectangle, Color.White);
+				hudBatch.Draw(hudBalanceIndicatorTexture, hudBalanceIndicatorRectangle, Color.White);
 
                 hudBatch.End();
             }

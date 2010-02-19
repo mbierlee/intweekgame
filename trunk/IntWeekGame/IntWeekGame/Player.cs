@@ -1,106 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using IntWeekGame.RoadObjects;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
-using IntWeekGame.RoadObjects;
 
 namespace IntWeekGame
 {
     public class Player
     {
-        private Texture2D legsTextureStrip;
-        private Texture2D bodyTextureStrip;
-
+        private readonly Vector2 fallenPlayerOrigin;
         private readonly Vector2 legsOrigin;
-        private Vector2 bodyOrigin;
-        private Vector2 position;
+        private readonly float scale;
         private readonly float yPosition;
         private float balance;
-        public bool Fallen { get; set; }
-        private float scale;
-        public Rectangle CollisionMask { get; set; }
-
-        private Rectangle legsTextureDrawArea;
+        private Vector2 bodyOrigin;
         private Rectangle bodyTextureDrawArea;
+        private Texture2D bodyTextureStrip;
+        private Texture2D fallenPlayer;
         private int frameTick;
+        private Rectangle legsTextureDrawArea;
+        private Texture2D legsTextureStrip;
+        private Vector2 position;
 
-        public Rectangle CollisionArea
-        {
-            get
-            {
-                return new Rectangle((int)((XPosition) - (CollisionMask.Width * scale)), (int)((YPosition) - (CollisionMask.Height * scale)), (int)((CollisionMask.Width * scale) * 2), (int)((CollisionMask.Height * scale) * 2));
-            }
-        }
+        private float xPosition;
 
         public Player()
         {
-            IntWeekGame game = (IntWeekGame)IntWeekGame.GameInstance;
+            var game = (IntWeekGame) IntWeekGame.GameInstance;
 
-            XPosition = (float)game.GraphicsDevice.Viewport.Width / 2;
+            XPosition = (float) game.GraphicsDevice.Viewport.Width/2;
             //yPosition = 550f;
             yPosition = 500f;
             scale = Util.GetParallelScaleFromY(yPosition);
             legsOrigin = new Vector2(43, 126);
             bodyOrigin = new Vector2(123, 132);
+            fallenPlayerOrigin = new Vector2(30, 50);
 
             legsTextureDrawArea = new Rectangle(0, 0, 89, 130);
             bodyTextureDrawArea = new Rectangle(0, 0, 243, 138);
         }
 
-        public void LoadContent()
+        public bool Fallen { get; set; }
+        public Rectangle CollisionMask { get; set; }
+
+        public Rectangle CollisionArea
         {
-            legsTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerlegs_strip15");
-            bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
-        }
-
-        public void Update()
-        {
-            position = new Vector2(XPosition, YPosition);
-        }
-
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            Vector2 bodyPosition = new Vector2(position.X, position.Y - ((legsTextureDrawArea.Height - (bodyTextureDrawArea.Height - bodyOrigin.Y)) * scale));
-
-            legsTextureDrawArea.X = (frameTick / (60 / 15)) * legsTextureDrawArea.Width;
-            bodyTextureDrawArea.X = (frameTick / (60 / 10)) * bodyTextureDrawArea.Width;
-
-            spriteBatch.Draw(legsTextureStrip, position, legsTextureDrawArea, Color.White, 0, LegsOrigin, scale, SpriteEffects.None, 1 - scale);
-            spriteBatch.Draw(bodyTextureStrip, bodyPosition, bodyTextureDrawArea, Color.White, MathHelper.ToRadians(MathHelper.Lerp(0, 40, Balance)), bodyOrigin, scale, SpriteEffects.None, 1 - scale);
-            ////spriteBatch.Draw(IntWeekGame.TestBall, new Vector2((balance * 400) + 400, 0), Color.White);
-
-            if (IntWeekGame.DebugDrawCollisionBoxes)
+            get
             {
-                spriteBatch.Draw(IntWeekGame.Pixel, CollisionArea, Color.Red);
-            }
-
-            frameTick++;
-            if (frameTick == 60)
-            {
-                frameTick = 0;
+                return new Rectangle((int) ((XPosition) - (CollisionMask.Width*scale)),
+                                     (int) ((YPosition) - (CollisionMask.Height*scale)),
+                                     (int) ((CollisionMask.Width*scale)*2), (int) ((CollisionMask.Height*scale)*2));
             }
         }
-
-        public void InfluenceFromBalance()
-        {
-            if (Fallen)
-            {
-                return;
-            }
-
-            XPosition += (4 * Balance);
-        }
-
-        private float xPosition;
 
         public float XPosition
         {
@@ -124,20 +73,93 @@ namespace IntWeekGame
             get { return legsOrigin; }
         }
 
+        public void LoadContent()
+        {
+            legsTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerlegs_strip15");
+            bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
+            fallenPlayer = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/FallenPlayer");
+        }
+
+        public void Update()
+        {
+            position = new Vector2(XPosition, YPosition);
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            var bodyPosition = new Vector2(position.X,
+                                           position.Y -
+                                           ((legsTextureDrawArea.Height - (bodyTextureDrawArea.Height - bodyOrigin.Y))*
+                                            scale));
+
+            legsTextureDrawArea.X = (frameTick/(60/15))*legsTextureDrawArea.Width;
+            bodyTextureDrawArea.X = (frameTick/(60/10))*bodyTextureDrawArea.Width;
+
+            if (!Fallen)
+            {
+                spriteBatch.Draw(legsTextureStrip, position, legsTextureDrawArea, Color.White, 0, LegsOrigin, scale,
+                                 SpriteEffects.None, 1 - scale);
+                spriteBatch.Draw(bodyTextureStrip, bodyPosition, bodyTextureDrawArea, Color.White,
+                                 MathHelper.ToRadians(MathHelper.Lerp(0, 40, Balance)), bodyOrigin, scale,
+                                 SpriteEffects.None, 1 - scale);
+                frameTick++;
+                if (frameTick == 60)
+                {
+                    frameTick = 0;
+                }
+            }
+            else
+            {
+                if (balance >= 0)
+                {
+                    spriteBatch.Draw(fallenPlayer, position, null, Color.White, 0, fallenPlayerOrigin, scale,
+                                     SpriteEffects.None, 1 - scale);
+                }
+                else
+                {
+                    spriteBatch.Draw(fallenPlayer, position, null, Color.White, 0,
+                                     new Vector2(fallenPlayer.Width, fallenPlayer.Height) - fallenPlayerOrigin, scale,
+                                     SpriteEffects.FlipHorizontally, 1 - scale);
+                }
+            }
+
+            /*
+            if (IntWeekGame.DebugDrawCollisionBoxes)
+            {
+                spriteBatch.Draw(IntWeekGame.Pixel, CollisionArea, Color.Red);
+            }*/
+        }
+
+        public void InfluenceFromBalance()
+        {
+            if (Fallen)
+            {
+                return;
+            }
+
+            XPosition += (4*Balance);
+        }
+
 
         public void CheckPlayerCollisionWithObject(ParallelGameObject parallelGameObject)
         {
-            IntWeekGame game = ((IntWeekGame) IntWeekGame.GameInstance);
+            var game = ((IntWeekGame) IntWeekGame.GameInstance);
 
             if (parallelGameObject.Collidable && (
-                                                                       parallelGameObject.CollisionArea.Contains(
-                                                                           CollisionArea) ||
-                                                                       parallelGameObject.CollisionArea.Intersects(
-                                                                           CollisionArea)))
+                                                     parallelGameObject.CollisionArea.Contains(
+                                                         CollisionArea) ||
+                                                     parallelGameObject.CollisionArea.Intersects(
+                                                         CollisionArea)))
             {
-                if (parallelGameObject is StreetLight || parallelGameObject is TrashCan)
+                if (parallelGameObject is StreetLight)
                 {
                     game.PlayerHitObstacle();
+                }
+                else if (parallelGameObject is TrashCan)
+                {
+                    game.PlayerHitObstacle();
+                    parallelGameObject.Texture2D = game.KnockedOverTrashCanTexture;
+                    parallelGameObject.Origin = new Vector2(153, 76);
                 }
                 else if (parallelGameObject is Car)
                 {
@@ -145,12 +167,14 @@ namespace IntWeekGame
                     parallelGameObject.Speed = 0;
                     parallelGameObject.Texture2D = game.BrokenCarTexture;
                     parallelGameObject.Origin = new Vector2(159, 188);
-                } else if (parallelGameObject is Beer)
+                }
+                else if (parallelGameObject is Beer)
                 {
                     game.Score += 200;
                     game.Tiredness += 0.2f;
                     game.RemoveGameObject(parallelGameObject);
-                } else if (parallelGameObject is Coffee)
+                }
+                else if (parallelGameObject is Coffee)
                 {
                     game.Score += 50;
                     game.Tiredness -= 0.3f;

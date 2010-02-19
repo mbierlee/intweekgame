@@ -68,7 +68,7 @@ namespace IntWeekGame
 
             balanceScale = 0.01f;
             //wiiBalanceScale = 0.01f;
-            wiiBalanceScale = 2f;
+            wiiBalanceScale = 0.05f;
             DefaultScrollSpeed =1.0f;
             ScrollSpeed = DefaultScrollSpeed;
 
@@ -291,7 +291,7 @@ namespace IntWeekGame
             }
             else
             {
-                player.Balance += (balanceModifier*(balanceScale*random.Next(1, 3)))/2;
+                player.Balance += (balanceModifier*(balanceScale*random.Next(1, 4)))/2;
             }
         }
 

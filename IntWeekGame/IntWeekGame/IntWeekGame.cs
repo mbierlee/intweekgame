@@ -291,7 +291,7 @@ namespace IntWeekGame
             }
             else
             {
-                player.Balance += (balanceModifier*(balanceScale*random.Next(1, 4)))/2;
+                player.Balance += (balanceModifier * (balanceScale * random.Next(1, (int)MathHelper.Clamp((int)(16 * Tiredness), 1, 16)))) / 2;
             }
         }
 

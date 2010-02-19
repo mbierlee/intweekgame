@@ -68,7 +68,7 @@ namespace IntWeekGame
 
             balanceScale = 0.01f;
             //wiiBalanceScale = 0.01f;
-            wiiBalanceScale = 1f;
+            wiiBalanceScale = 2f;
             DefaultScrollSpeed =1.0f;
             ScrollSpeed = DefaultScrollSpeed;
 
@@ -132,7 +132,7 @@ namespace IntWeekGame
             parallelGameObjectCollection = new List<ParallelGameObject>();
             viewPortRectangle = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y,
                                               GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            player = new Player {CollisionMask = new Rectangle(0, 0, 38, 2)};
+            player = new Player {CollisionMask = new Rectangle(0, 0, 38, 4)};
             var hud = new Hud(this);
             Components.Add(hud);
             Services.AddService(typeof (Hud), hud);

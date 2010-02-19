@@ -19,9 +19,7 @@ namespace IntWeekGame
         private int frameTick;
         private Rectangle legsTextureDrawArea;
         private Texture2D legsTextureStrip;
-		private SoundEffect soundBurp;
-		private SoundEffect soundSwallowing;
-		private SoundEffect soundBeerOpening;
+		private SoundEffect soundBeer;
 		private SoundEffect soundSlurp;
 		private Vector2 position;
 
@@ -84,9 +82,7 @@ namespace IntWeekGame
             //bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/testplayer");
             fallenPlayer = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/FallenPlayer");
 
-			soundBurp = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Burp");
-			soundBeerOpening = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/BeerOpening");
-			soundSwallowing = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Swallowing");
+			soundBeer = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Beer");
 			soundSlurp = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Slurp");
         }
 
@@ -180,9 +176,7 @@ namespace IntWeekGame
                 }
                 else if (parallelGameObject is Beer)
                 {
-					soundBeerOpening.Play();
-					soundSwallowing.Play();
-					soundBurp.Play();
+					soundBeer.Play();
 
 					game.Score += 200;
                     game.Tiredness += 0.2f;

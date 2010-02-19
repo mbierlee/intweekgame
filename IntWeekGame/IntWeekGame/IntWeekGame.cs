@@ -165,7 +165,7 @@ namespace IntWeekGame
             CoffeeTexture = Content.Load<Texture2D>("Sprites/koffie");
             KnockedOverTrashCanTexture = Content.Load<Texture2D>("Sprites/TrashcanKnockedOver");
 
-            soundFall = GameInstance.Content.Load<SoundEffect>("Audio/Bounce");
+            soundFall = GameInstance.Content.Load<SoundEffect>("Audio/Burp");
 
             // Cheat to getting scenery before the game begins.
             PrepareScenery();

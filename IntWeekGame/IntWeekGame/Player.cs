@@ -191,7 +191,7 @@ namespace IntWeekGame
 				{
 					soundBeer.Play();
 
-					game.Score += 200;
+					game.Score += 20;
 					game.Tiredness += 0.2f;
 					game.RemoveGameObject(parallelGameObject);
 				}
@@ -199,7 +199,7 @@ namespace IntWeekGame
 				{
 					soundCoffee.Play();
 
-					game.Score += 50;
+					game.Score += 3;
 					game.Tiredness -= 0.3f;
 					game.RemoveGameObject(parallelGameObject);
 				}

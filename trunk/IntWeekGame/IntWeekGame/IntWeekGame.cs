@@ -179,7 +179,7 @@ namespace IntWeekGame
                 SpawnRoadObjects(null);
                 if (ticks > 60)
                 {
-                    SpawnObstacle();
+                    SpawnObstacle(false);
                     ticks = 0;
                 }
                 UpdateParallelGameObjects();
@@ -431,7 +431,7 @@ namespace IntWeekGame
             {
                 if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
                 {
-                    SpawnObstacle();
+                    SpawnObstacle(true);
 
                     lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
 
@@ -443,7 +443,7 @@ namespace IntWeekGame
             }
         }
 
-        private void SpawnObstacle()
+        private void SpawnObstacle(bool spawnCars)
         {
             int typeChance = random.Next(0, 100);
 
@@ -456,7 +456,7 @@ namespace IntWeekGame
                                    };
                 parallelGameObjectCollection.Add(trashCan);
             }
-            else if (typeChance > 85 && typeChance < 100)
+            else if (typeChance > 85 && typeChance < 100 && spawnCars)
             {
                 var car = new Car
                               {

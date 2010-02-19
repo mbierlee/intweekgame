@@ -75,6 +75,7 @@ namespace IntWeekGame
             GameInstance = this;
 
             graphics = new GraphicsDeviceManager(this);
+			graphics.IsFullScreen = true;
             backgroundRectangle = new Rectangle(0, 0, 800, 600);
 
             Content.RootDirectory = "Content";

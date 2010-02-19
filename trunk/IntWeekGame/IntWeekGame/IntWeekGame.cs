@@ -297,7 +297,7 @@ namespace IntWeekGame
 			}
 			else
 			{
-				player.Balance += (balanceModifier * (balanceScale * random.Next(1, (int)MathHelper.Clamp((int)(16 * Tiredness), 1, 16)))) / 2;
+				player.Balance += (balanceModifier * (balanceScale * random.Next(1, (int)MathHelper.Clamp((int)(10 * Tiredness), 1, 16)))) / 2;
 			}
 		}
 
@@ -305,7 +305,7 @@ namespace IntWeekGame
 		{
 			if (wiimote != null)
 			{
-				player.Balance += wiimote.WiimoteState.AccelState.Values.Y * wiiBalanceScale;
+				player.Balance += (wiimote.WiimoteState.AccelState.Values.Y / 2) * wiiBalanceScale;
 			}
 
 			if (keyboardState.IsKeyDown(Keys.Left))
@@ -488,7 +488,7 @@ namespace IntWeekGame
 
 		private void AddScoreAndTiredness()
 		{
-			Score++;
+			Score += 4;
 			tiredness += 0.01f;
 		}
 

@@ -173,10 +173,17 @@ namespace IntWeekGame
 
         private void PrepareScenery()
         {
+            int ticks = 0;
             for (int i = 0; i < (2000/ScrollSpeed); i++)
             {
                 SpawnRoadObjects(null);
+                if (ticks > 60)
+                {
+                    SpawnObstacle();
+                    ticks = 0;
+                }
                 UpdateParallelGameObjects();
+                ticks++;
             }
         }
 
@@ -332,7 +339,7 @@ namespace IntWeekGame
                 {
                     parallelGameObjectCollection.Remove(parallelGameObject);
                 }
-                else
+                else if (gamestate == Gamestate.Playing)
                 {
                     player.CheckPlayerCollisionWithObject(parallelGameObject);
                 }
@@ -424,11 +431,11 @@ namespace IntWeekGame
             {
                 if (gameTime.TotalGameTime.TotalSeconds - lastObstacleSpawn > 2)
                 {
-                    SpawnObstacles();
+                    SpawnObstacle();
 
                     lastObstacleSpawn = gameTime.TotalGameTime.TotalSeconds;
 
-                    if (gamestate == Gamestate.Start)
+                    if (gamestate == Gamestate.Playing)
                     {
                         AddScoreAndTiredness();
                     }
@@ -436,7 +443,7 @@ namespace IntWeekGame
             }
         }
 
-        private void SpawnObstacles()
+        private void SpawnObstacle()
         {
             int typeChance = random.Next(0, 100);
 

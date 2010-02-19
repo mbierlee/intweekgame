@@ -35,7 +35,7 @@ namespace IntWeekGame
         public Texture2D CoffeeTexture;
         private SpriteBatch flatObjectsSpriteBatch;
         private Gamestate gamestate;
-        private GraphicsDeviceManager graphics;
+        private readonly GraphicsDeviceManager graphics;
         public Vector2 Horizon;
         private KeyboardState keyboardState;
         public Texture2D KnockedOverTrashCanTexture;
@@ -250,6 +250,11 @@ namespace IntWeekGame
             hud.Score = Score;
             hud.Tiredness = Tiredness;
 
+            if (Tiredness == 1)
+            {
+                PlayerFell();
+            }
+
             base.Update(gameTime);
         }
 
@@ -350,7 +355,7 @@ namespace IntWeekGame
             gamestate = Gamestate.Playing;
         }
 
-        internal void PlayerFell()
+        private void PlayerFell()
         {
             soundFall.Play();
             PlayerHitObstacle();

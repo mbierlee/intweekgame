@@ -177,7 +177,7 @@ namespace IntWeekGame
             for (int i = 0; i < (2000/ScrollSpeed); i++)
             {
                 SpawnRoadObjects(null);
-                if (ticks > 60)
+                if (ticks > 120)
                 {
                     SpawnObstacle(false);
                     ticks = 0;
@@ -296,7 +296,7 @@ namespace IntWeekGame
         {
             if (wiimote != null)
             {
-                player.Balance += wiimote.WiimoteState.AccelState.Values.X*wiiBalanceScale;
+                player.Balance += wiimote.WiimoteState.AccelState.Values.Y*wiiBalanceScale;
             }
 
             if (keyboardState.IsKeyDown(Keys.Left))
@@ -447,7 +447,7 @@ namespace IntWeekGame
         {
             int typeChance = random.Next(0, 100);
 
-            if (typeChance > 0 && typeChance < 40)
+            if (typeChance > 10 && typeChance < 20)
             {
                 var trashCan = new TrashCan
                                    {

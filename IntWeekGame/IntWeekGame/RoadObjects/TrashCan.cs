@@ -19,8 +19,8 @@ namespace IntWeekGame.RoadObjects
         public TrashCan()
             : base(((IntWeekGame)IntWeekGame.GameInstance).TrashCanTexture)
         {
-            CollisionMask = new Rectangle(0, 0, 35, 2);
-            Origin = new Vector2(47, 110);
+            CollisionMask = new Rectangle(0, 0, 19, 2);
+            Origin = new Vector2(38, 89);
         }
     }
 }

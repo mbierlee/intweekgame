@@ -1,5 +1,6 @@
 ﻿using IntWeekGame.RoadObjects;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace IntWeekGame
@@ -18,7 +19,11 @@ namespace IntWeekGame
         private int frameTick;
         private Rectangle legsTextureDrawArea;
         private Texture2D legsTextureStrip;
-        private Vector2 position;
+		private SoundEffect soundBurp;
+		private SoundEffect soundSwallowing;
+		private SoundEffect soundBeerOpening;
+		private SoundEffect soundSlurp;
+		private Vector2 position;
 
         private float xPosition;
 
@@ -78,6 +83,11 @@ namespace IntWeekGame
             //bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/playerbody_strip10");
             bodyTextureStrip = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/testplayer");
             fallenPlayer = IntWeekGame.GameInstance.Content.Load<Texture2D>("Sprites/FallenPlayer");
+
+			soundBurp = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Burp");
+			soundBeerOpening = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/BeerOpening");
+			soundSwallowing = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Swallowing");
+			soundSlurp = IntWeekGame.GameInstance.Content.Load<SoundEffect>("Audio/Slurp");
         }
 
         public void Update()
@@ -170,13 +180,19 @@ namespace IntWeekGame
                 }
                 else if (parallelGameObject is Beer)
                 {
-                    game.Score += 200;
+					soundBeerOpening.Play();
+					soundSwallowing.Play();
+					soundBurp.Play();
+
+					game.Score += 200;
                     game.Tiredness += 0.2f;
                     game.RemoveGameObject(parallelGameObject);
                 }
                 else if (parallelGameObject is Coffee)
                 {
-                    game.Score += 50;
+					soundSlurp.Play();
+
+					game.Score += 50;
                     game.Tiredness -= 0.3f;
                     game.RemoveGameObject(parallelGameObject);
                 }

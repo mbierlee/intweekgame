@@ -95,6 +95,7 @@
     <Compile Include="RoadObjects\Beer.cs" />
     <Compile Include="RoadObjects\Car.cs" />
     <Compile Include="RoadObjects\Coffee.cs" />
+    <Compile Include="RoadObjects\Puddle.cs" />
     <Compile Include="RoadObjects\StreetLight.cs" />
     <Compile Include="RoadObjects\TrashCan.cs" />
     <Compile Include="StartScreen.cs" />
